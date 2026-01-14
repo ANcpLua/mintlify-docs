@@ -156,6 +156,15 @@
       "vscode"
     ]
   },
+  "assistant": {
+    "enabled": true,
+    "model": "gpt-4o-mini",
+    "defaultPrompts": [
+      "How do I get started with ANcpLua.NET.Sdk?",
+      "What analyzers are included?",
+      "How do I use polyfills?"
+    ]
+  },
   "footer": {
     "socials": {
       "github": "https://github.com/ANcpLua"

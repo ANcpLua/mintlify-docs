@@ -1,15 +1,15 @@
 ---
 title: "ANcpLua Framework"
-description: "Opinionated .NET SDK with polyfills, analyzers, and best practices"
+description: "Opinionated .NET SDK with polyfills, analyzers, and best practices for C# projects"
 ---
 
 # ANcpLua Framework
 
 A comprehensive .NET development ecosystem providing opinionated defaults, automated polyfills, custom analyzers, and Roslyn utilities for building high-quality applications.
 
-## Getting Started
+## What is ANcpLua.NET.Sdk?
 
-Add ANcpLua.NET.Sdk to your project and get immediate access to modern C# features, enforced best practices, and automated code quality tooling.
+ANcpLua.NET.Sdk is an opinionated MSBuild SDK that automatically configures your .NET projects with modern C# features, code quality analyzers, and best practices. Add it to your project and get immediate access to enforced coding standards, automated polyfills for legacy frameworks, and production-ready tooling.
 
 <Card
   title="Quickstart"
@@ -19,6 +19,16 @@ Add ANcpLua.NET.Sdk to your project and get immediate access to modern C# featur
 >
   Get started with ANcpLua.NET.Sdk in 5 minutes.
 </Card>
+
+## Which SDK Should I Use?
+
+Choose the SDK variant based on your project type:
+
+| SDK Variant | Use For | Key Features |
+|-------------|---------|--------------|
+| `ANcpLua.NET.Sdk` | Libraries, Console Apps, Workers | Analyzers, Polyfills, Banned APIs, Guard Clauses |
+| `ANcpLua.NET.Sdk.Web` | ASP.NET Core Web APIs | All Base features + OpenTelemetry, Health Checks, HTTP Resilience |
+| `ANcpLua.NET.Sdk.Test` | xUnit Test Projects | All Base features + xUnit v3 with MTP, Test Coverage |
 
 ## Ecosystem
 
@@ -53,25 +63,37 @@ Add ANcpLua.NET.Sdk to your project and get immediate access to modern C# featur
   </Card>
 </CardGroup>
 
-## What You Get
+## What Does the SDK Provide?
 
-**With ANcpLua.NET.Sdk:**
+### Base SDK Features (ANcpLua.NET.Sdk)
 
-- Automatic polyfills for legacy target frameworks (netstandard2.0, net472)
-- Enforced banned APIs (see [Banned APIs](/sdk/banned-apis) for the full list)
-- Pre-configured analyzers (ANcpLua.Analyzers, Meziantou.Analyzer)
-- Guard clauses via `Throw.IfNull()`
-- LangVersion `latest` and nullable enabled by default
-- Deterministic reproducible builds
+| Feature | Description |
+|---------|-------------|
+| **Polyfills** | Automatic Index/Range, IsExternalInit for netstandard2.0/net472 |
+| **Analyzers** | Pre-configured [ANcpLua.Analyzers](/analyzers/overview), Meziantou.Analyzer |
+| **Banned APIs** | Enforced restrictions on [legacy APIs](/sdk/banned-apis) |
+| **Guard Clauses** | `Throw.IfNull()` for clean argument validation |
+| **Modern C#** | LangVersion `latest`, nullable enabled by default |
+| **Deterministic** | Reproducible builds out of the box |
 
-**With ANcpLua.NET.Sdk.Web:**
+### Web SDK Features (ANcpLua.NET.Sdk.Web)
 
-- OpenTelemetry integration (logging, metrics, tracing with OTLP)
-- Health endpoints (`/health`, `/alive`)
-- HTTP resilience (retries, circuit breakers)
-- DevLogs (browser console to server logs)
+| Feature | Description |
+|---------|-------------|
+| **OpenTelemetry** | Logging, metrics, tracing with OTLP export |
+| **Health Checks** | `/health` and `/alive` endpoints |
+| **HTTP Resilience** | Retries, circuit breakers via Polly |
+| **DevLogs** | Browser console to server logs |
 
-## Requirements
+### Test SDK Features (ANcpLua.NET.Sdk.Test)
+
+| Feature | Description |
+|---------|-------------|
+| **xUnit v3** | Latest xUnit with Microsoft Testing Platform (MTP) |
+| **Coverage** | Test coverage tooling pre-configured |
+| **FakeLogger** | Opt-in extensions for logging tests |
+
+## What Are the Requirements?
 
 The SDK requires Central Package Management to be enabled:
 

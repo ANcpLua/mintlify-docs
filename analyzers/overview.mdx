@@ -1,14 +1,27 @@
 ---
 title: ANcpLua.Analyzers
-description: Custom Roslyn analyzers and code fixes for C# code quality
+description: "What is ANcpLua.Analyzers? Custom Roslyn analyzers and code fixes that enforce C# code quality, design patterns, and best practices"
 icon: "shield-check"
 ---
 
 # ANcpLua.Analyzers
 
-Custom Roslyn analyzers and code fixes
+ANcpLua.Analyzers is a collection of custom Roslyn analyzers and code fixes that enforce code quality, prevent common bugs, and promote consistent coding patterns in C# projects. These analyzers are automatically included when you use [ANcpLua.NET.Sdk](/sdk/overview).
 
-## Rules
+## What Categories of Rules Are Available?
+
+| Category | Rule Count | Description |
+|----------|------------|-------------|
+| **Design** | 4 | Primary constructor patterns, type partialness |
+| **Usage** | 6 | Span comparisons, IXmlSerializable, static lambdas |
+| **Style** | 3 | Pattern matching, null-guard normalization |
+| **ASP.NET Core** | 5 | Form binding, parameter validation |
+| **OpenTelemetry** | 2 | Semantic conventions, schema URLs |
+| **Threading** | 1 | Lock statement best practices |
+| **Reliability** | 1 | Division by zero prevention |
+| **VersionManagement** | 1 | Hardcoded package version detection |
+
+## All Rules
 
 |Id|Category|Description|Severity|Enabled|Code Fix|
 |--|--------|-----------|:------:|:-----:|:------:|
@@ -37,14 +50,49 @@ Custom Roslyn analyzers and code fixes
 |[AL0025](/analyzers/rules/AL0025)|Usage|Anonymous function can be made static|Info|Yes|Yes|
 
 
-## Refactorings
+## What Refactorings Are Included?
 
 |Id|Description|
 |--|-----------|
 |[AR0001](/analyzers/rules/AR0001)|Snake Case To Pascal Case|
 |[AR0002](/analyzers/rules/AR0002)|Make Static Lambda|
 
+## How Do I Configure the Analyzers?
 
-## Configuration
+All rules can be configured via `.editorconfig`. See [Configuration](/analyzers/configuration) for detailed settings.
 
-See [Configuration](/analyzers/configuration) for .editorconfig settings.
+Example configuration:
+
+```ini
+# .editorconfig
+[*.cs]
+# Change AL0014 from Info to Warning
+dotnet_diagnostic.AL0014.severity = warning
+
+# Disable AL0010 (Type should be partial)
+dotnet_diagnostic.AL0010.severity = none
+```
+
+## Common Questions
+
+<AccordionGroup>
+  <Accordion title="Are these analyzers automatically included with the SDK?">
+    Yes. When you use `ANcpLua.NET.Sdk`, `ANcpLua.NET.Sdk.Web`, or `ANcpLua.NET.Sdk.Test`, the analyzers are automatically added to your project. You do not need to install them separately.
+  </Accordion>
+
+  <Accordion title="How do I disable a specific analyzer rule?">
+    Add a rule to your `.editorconfig` file with severity `none`. For example: `dotnet_diagnostic.AL0010.severity = none`. See [Configuration](/analyzers/configuration) for all options.
+  </Accordion>
+
+  <Accordion title="Can I use ANcpLua.Analyzers without the SDK?">
+    Yes. Install the `ANcpLua.Analyzers` NuGet package directly: `dotnet add package ANcpLua.Analyzers`. However, using the SDK provides additional benefits like polyfills and banned API enforcement.
+  </Accordion>
+
+  <Accordion title="What is the difference between Warning and Error severity?">
+    Warnings appear in the build output but do not fail the build. Errors cause the build to fail. Rules like AL0001 (primary constructor reassignment) and AL0003 (division by zero) are errors because they indicate definite bugs.
+  </Accordion>
+
+  <Accordion title="Which rules have code fixes?">
+    Rules with "Yes" in the Code Fix column can be automatically fixed via IDE quick actions or `dotnet format`. This includes style rules (AL0014, AL0015, AL0016), pattern matching (AL0002, AL0004, AL0005), and IXmlSerializable (AL0008).
+  </Accordion>
+</AccordionGroup>
