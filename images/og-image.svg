@@ -1,58 +1,98 @@
 <svg width="1200" height="630" viewBox="0 0 1200 630" fill="none" xmlns="http://www.w3.org/2000/svg">
-  <!-- Background gradient -->
   <defs>
-    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" style="stop-color:#0f172a"/>
-      <stop offset="100%" style="stop-color:#1e293b"/>
+    <!-- Deep space background -->
+    <linearGradient id="spaceBg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#030014"/>
+      <stop offset="50%" stop-color="#0a0520"/>
+      <stop offset="100%" stop-color="#0f0a1a"/>
     </linearGradient>
-    <linearGradient id="accent" x1="0%" y1="0%" x2="100%" y2="0%">
-      <stop offset="0%" style="stop-color:#06B6D4"/>
-      <stop offset="100%" style="stop-color:#0891B2"/>
-    </linearGradient>
+
+    <!-- Aurora glow - main -->
+    <radialGradient id="auroraMain" cx="35%" cy="60%" r="50%" fx="30%" fy="55%">
+      <stop offset="0%" stop-color="#7c3aed" stop-opacity="0.8"/>
+      <stop offset="30%" stop-color="#6366f1" stop-opacity="0.5"/>
+      <stop offset="60%" stop-color="#06b6d4" stop-opacity="0.3"/>
+      <stop offset="100%" stop-color="transparent"/>
+    </radialGradient>
+
+    <!-- Aurora glow - secondary -->
+    <radialGradient id="auroraSecondary" cx="70%" cy="30%" r="40%" fx="65%" fy="25%">
+      <stop offset="0%" stop-color="#8b5cf6" stop-opacity="0.4"/>
+      <stop offset="50%" stop-color="#a855f7" stop-opacity="0.2"/>
+      <stop offset="100%" stop-color="transparent"/>
+    </radialGradient>
+
+    <!-- Cyan accent glow -->
+    <radialGradient id="cyanGlow" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#06b6d4" stop-opacity="0.6"/>
+      <stop offset="40%" stop-color="#0891b2" stop-opacity="0.3"/>
+      <stop offset="100%" stop-color="transparent"/>
+    </radialGradient>
+
+    <!-- Text glow filter -->
+    <filter id="glow" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur stdDeviation="3" result="blur"/>
+      <feMerge>
+        <feMergeNode in="blur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+
+    <!-- Soft blur for aurora -->
+    <filter id="softBlur" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur stdDeviation="40"/>
+    </filter>
+
+    <!-- Grain texture -->
+    <filter id="grain">
+      <feTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves="4" result="noise"/>
+      <feColorMatrix type="saturate" values="0"/>
+      <feComponentTransfer>
+        <feFuncA type="linear" slope="0.1"/>
+      </feComponentTransfer>
+      <feBlend mode="overlay" in="SourceGraphic"/>
+    </filter>
   </defs>
 
-  <!-- Background -->
-  <rect width="1200" height="630" fill="url(#bg)"/>
+  <!-- Base background -->
+  <rect width="1200" height="630" fill="url(#spaceBg)"/>
 
-  <!-- Decorative elements -->
-  <circle cx="1100" cy="100" r="200" fill="#0891B2" opacity="0.1"/>
-  <circle cx="100" cy="530" r="150" fill="#06B6D4" opacity="0.1"/>
+  <!-- Aurora layers -->
+  <ellipse cx="400" cy="400" rx="500" ry="350" fill="url(#auroraMain)" filter="url(#softBlur)"/>
+  <ellipse cx="850" cy="200" rx="400" ry="300" fill="url(#auroraSecondary)" filter="url(#softBlur)"/>
+  <ellipse cx="300" cy="350" rx="200" ry="150" fill="url(#cyanGlow)" filter="url(#softBlur)"/>
 
-  <!-- Top accent line -->
-  <rect x="0" y="0" width="1200" height="4" fill="url(#accent)"/>
+  <!-- Subtle stars -->
+  <circle cx="150" cy="80" r="1" fill="#fff" opacity="0.6"/>
+  <circle cx="350" cy="120" r="0.8" fill="#fff" opacity="0.4"/>
+  <circle cx="550" cy="60" r="1.2" fill="#fff" opacity="0.5"/>
+  <circle cx="780" cy="90" r="0.6" fill="#fff" opacity="0.3"/>
+  <circle cx="950" cy="150" r="1" fill="#fff" opacity="0.5"/>
+  <circle cx="1050" cy="80" r="0.8" fill="#fff" opacity="0.4"/>
+  <circle cx="1100" cy="200" r="0.5" fill="#fff" opacity="0.3"/>
+  <circle cx="200" cy="180" r="0.7" fill="#fff" opacity="0.35"/>
+  <circle cx="680" cy="140" r="0.9" fill="#fff" opacity="0.45"/>
+  <circle cx="880" cy="50" r="0.6" fill="#fff" opacity="0.3"/>
 
-  <!-- Logo/Brand name -->
-  <text x="100" y="280" font-family="system-ui, -apple-system, BlinkMacSystemFont, sans-serif" font-size="72" font-weight="700" fill="#06B6D4">ANcpLua</text>
+  <!-- Light streaks (falling stars effect) -->
+  <line x1="1000" y1="450" x2="1010" y2="520" stroke="url(#cyanGlow)" stroke-width="1" opacity="0.3"/>
+  <line x1="1080" y1="380" x2="1088" y2="440" stroke="#8b5cf6" stroke-width="0.8" opacity="0.25"/>
+  <line x1="920" y1="500" x2="926" y2="550" stroke="#06b6d4" stroke-width="0.6" opacity="0.2"/>
+  <line x1="1050" y1="520" x2="1055" y2="560" stroke="#a855f7" stroke-width="0.5" opacity="0.2"/>
+  <line x1="850" y1="480" x2="854" y2="510" stroke="#6366f1" stroke-width="0.6" opacity="0.15"/>
 
-  <!-- Subtitle -->
-  <text x="100" y="350" font-family="system-ui, -apple-system, BlinkMacSystemFont, sans-serif" font-size="36" font-weight="400" fill="#94a3b8">.NET SDK with Analyzers &amp; Polyfills</text>
+  <!-- Brand name - premium typography -->
+  <text x="100" y="300" font-family="SF Pro Display, -apple-system, BlinkMacSystemFont, system-ui, sans-serif" font-size="80" font-weight="600" fill="#ffffff" letter-spacing="-2" filter="url(#glow)">ANcpLua</text>
 
-  <!-- Description -->
-  <text x="100" y="420" font-family="system-ui, -apple-system, BlinkMacSystemFont, sans-serif" font-size="24" fill="#64748b">Opinionated MSBuild SDK for modern .NET development</text>
+  <!-- Tagline -->
+  <text x="100" y="370" font-family="SF Pro Text, -apple-system, BlinkMacSystemFont, system-ui, sans-serif" font-size="28" font-weight="400" fill="#a1a1aa" letter-spacing="0.5">.NET SDK · Analyzers · Polyfills</text>
 
-  <!-- Feature pills -->
-  <rect x="100" y="480" width="140" height="40" rx="20" fill="#0891B2" opacity="0.2"/>
-  <text x="130" y="507" font-family="system-ui, sans-serif" font-size="16" font-weight="500" fill="#06B6D4">Analyzers</text>
+  <!-- Subtle descriptor -->
+  <text x="100" y="420" font-family="SF Pro Text, -apple-system, BlinkMacSystemFont, system-ui, sans-serif" font-size="18" font-weight="300" fill="#71717a" letter-spacing="0.3">Modern development for .NET 10</text>
 
-  <rect x="260" y="480" width="120" height="40" rx="20" fill="#0891B2" opacity="0.2"/>
-  <text x="285" y="507" font-family="system-ui, sans-serif" font-size="16" font-weight="500" fill="#06B6D4">Polyfills</text>
+  <!-- Accent line -->
+  <rect x="100" y="450" width="80" height="3" rx="1.5" fill="#06b6d4" opacity="0.8"/>
 
-  <rect x="400" y="480" width="150" height="40" rx="20" fill="#0891B2" opacity="0.2"/>
-  <text x="425" y="507" font-family="system-ui, sans-serif" font-size="16" font-weight="500" fill="#06B6D4">OpenTelemetry</text>
-
-  <rect x="570" y="480" width="100" height="40" rx="20" fill="#0891B2" opacity="0.2"/>
-  <text x="592" y="507" font-family="system-ui, sans-serif" font-size="16" font-weight="500" fill="#06B6D4">Roslyn</text>
-
-  <!-- Code decoration -->
-  <rect x="800" y="200" width="300" height="230" rx="12" fill="#1e293b" stroke="#334155" stroke-width="1"/>
-  <circle cx="825" cy="225" r="6" fill="#ef4444"/>
-  <circle cx="847" cy="225" r="6" fill="#eab308"/>
-  <circle cx="869" cy="225" r="6" fill="#22c55e"/>
-
-  <text x="820" y="270" font-family="monospace" font-size="14" fill="#64748b">&lt;Project Sdk=</text>
-  <text x="820" y="295" font-family="monospace" font-size="14" fill="#06B6D4">  "ANcpLua.NET.Sdk"</text>
-  <text x="820" y="320" font-family="monospace" font-size="14" fill="#64748b">&gt;</text>
-  <text x="820" y="360" font-family="monospace" font-size="14" fill="#94a3b8">  &lt;TargetFramework&gt;</text>
-  <text x="820" y="385" font-family="monospace" font-size="14" fill="#22c55e">    net10.0</text>
-  <text x="820" y="410" font-family="monospace" font-size="14" fill="#94a3b8">  &lt;/TargetFramework&gt;</text>
+  <!-- Grain overlay for texture -->
+  <rect width="1200" height="630" fill="transparent" filter="url(#grain)" opacity="0.5"/>
 </svg>
