@@ -8,30 +8,23 @@
     </linearGradient>
 
     <!-- Aurora glow - main -->
-    <radialGradient id="auroraMain" cx="35%" cy="60%" r="50%" fx="30%" fy="55%">
-      <stop offset="0%" stop-color="#7c3aed" stop-opacity="0.8"/>
-      <stop offset="30%" stop-color="#6366f1" stop-opacity="0.5"/>
-      <stop offset="60%" stop-color="#06b6d4" stop-opacity="0.3"/>
+    <radialGradient id="auroraMain" cx="50%" cy="50%" r="50%" fx="45%" fy="45%">
+      <stop offset="0%" stop-color="#7c3aed" stop-opacity="0.7"/>
+      <stop offset="40%" stop-color="#6366f1" stop-opacity="0.4"/>
+      <stop offset="70%" stop-color="#06b6d4" stop-opacity="0.2"/>
       <stop offset="100%" stop-color="transparent"/>
     </radialGradient>
 
     <!-- Aurora glow - secondary -->
-    <radialGradient id="auroraSecondary" cx="70%" cy="30%" r="40%" fx="65%" fy="25%">
-      <stop offset="0%" stop-color="#8b5cf6" stop-opacity="0.4"/>
-      <stop offset="50%" stop-color="#a855f7" stop-opacity="0.2"/>
-      <stop offset="100%" stop-color="transparent"/>
-    </radialGradient>
-
-    <!-- Cyan accent glow -->
-    <radialGradient id="cyanGlow" cx="50%" cy="50%" r="50%">
-      <stop offset="0%" stop-color="#06b6d4" stop-opacity="0.6"/>
-      <stop offset="40%" stop-color="#0891b2" stop-opacity="0.3"/>
+    <radialGradient id="auroraSecondary" cx="70%" cy="30%" r="45%">
+      <stop offset="0%" stop-color="#8b5cf6" stop-opacity="0.35"/>
+      <stop offset="60%" stop-color="#a855f7" stop-opacity="0.15"/>
       <stop offset="100%" stop-color="transparent"/>
     </radialGradient>
 
     <!-- Text glow filter -->
     <filter id="glow" x="-50%" y="-50%" width="200%" height="200%">
-      <feGaussianBlur stdDeviation="3" result="blur"/>
+      <feGaussianBlur stdDeviation="4" result="blur"/>
       <feMerge>
         <feMergeNode in="blur"/>
         <feMergeNode in="SourceGraphic"/>
@@ -40,15 +33,15 @@
 
     <!-- Soft blur for aurora -->
     <filter id="softBlur" x="-50%" y="-50%" width="200%" height="200%">
-      <feGaussianBlur stdDeviation="40"/>
+      <feGaussianBlur stdDeviation="60"/>
     </filter>
 
     <!-- Grain texture -->
     <filter id="grain">
-      <feTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves="4" result="noise"/>
+      <feTurbulence type="fractalNoise" baseFrequency="0.8" numOctaves="4" result="noise"/>
       <feColorMatrix type="saturate" values="0"/>
       <feComponentTransfer>
-        <feFuncA type="linear" slope="0.1"/>
+        <feFuncA type="linear" slope="0.08"/>
       </feComponentTransfer>
       <feBlend mode="overlay" in="SourceGraphic"/>
     </filter>
@@ -57,42 +50,24 @@
   <!-- Base background -->
   <rect width="1200" height="630" fill="url(#spaceBg)"/>
 
-  <!-- Aurora layers -->
-  <ellipse cx="400" cy="400" rx="500" ry="350" fill="url(#auroraMain)" filter="url(#softBlur)"/>
-  <ellipse cx="850" cy="200" rx="400" ry="300" fill="url(#auroraSecondary)" filter="url(#softBlur)"/>
-  <ellipse cx="300" cy="350" rx="200" ry="150" fill="url(#cyanGlow)" filter="url(#softBlur)"/>
+  <!-- Aurora layers - centered -->
+  <ellipse cx="600" cy="315" rx="550" ry="400" fill="url(#auroraMain)" filter="url(#softBlur)"/>
+  <ellipse cx="750" cy="250" rx="350" ry="280" fill="url(#auroraSecondary)" filter="url(#softBlur)"/>
 
   <!-- Subtle stars -->
-  <circle cx="150" cy="80" r="1" fill="#fff" opacity="0.6"/>
-  <circle cx="350" cy="120" r="0.8" fill="#fff" opacity="0.4"/>
-  <circle cx="550" cy="60" r="1.2" fill="#fff" opacity="0.5"/>
-  <circle cx="780" cy="90" r="0.6" fill="#fff" opacity="0.3"/>
-  <circle cx="950" cy="150" r="1" fill="#fff" opacity="0.5"/>
-  <circle cx="1050" cy="80" r="0.8" fill="#fff" opacity="0.4"/>
-  <circle cx="1100" cy="200" r="0.5" fill="#fff" opacity="0.3"/>
-  <circle cx="200" cy="180" r="0.7" fill="#fff" opacity="0.35"/>
-  <circle cx="680" cy="140" r="0.9" fill="#fff" opacity="0.45"/>
-  <circle cx="880" cy="50" r="0.6" fill="#fff" opacity="0.3"/>
+  <circle cx="150" cy="80" r="1" fill="#fff" opacity="0.5"/>
+  <circle cx="350" cy="120" r="0.8" fill="#fff" opacity="0.35"/>
+  <circle cx="550" cy="60" r="1" fill="#fff" opacity="0.4"/>
+  <circle cx="780" cy="90" r="0.6" fill="#fff" opacity="0.25"/>
+  <circle cx="950" cy="150" r="1" fill="#fff" opacity="0.4"/>
+  <circle cx="1050" cy="80" r="0.7" fill="#fff" opacity="0.35"/>
+  <circle cx="1100" cy="200" r="0.5" fill="#fff" opacity="0.25"/>
+  <circle cx="100" cy="550" r="0.8" fill="#fff" opacity="0.3"/>
+  <circle cx="1080" cy="520" r="0.6" fill="#fff" opacity="0.25"/>
 
-  <!-- Light streaks (falling stars effect) -->
-  <line x1="1000" y1="450" x2="1010" y2="520" stroke="url(#cyanGlow)" stroke-width="1" opacity="0.3"/>
-  <line x1="1080" y1="380" x2="1088" y2="440" stroke="#8b5cf6" stroke-width="0.8" opacity="0.25"/>
-  <line x1="920" y1="500" x2="926" y2="550" stroke="#06b6d4" stroke-width="0.6" opacity="0.2"/>
-  <line x1="1050" y1="520" x2="1055" y2="560" stroke="#a855f7" stroke-width="0.5" opacity="0.2"/>
-  <line x1="850" y1="480" x2="854" y2="510" stroke="#6366f1" stroke-width="0.6" opacity="0.15"/>
+  <!-- Logo - centered -->
+  <text x="600" y="335" text-anchor="middle" font-family="SF Pro Display, -apple-system, BlinkMacSystemFont, system-ui, sans-serif" font-size="96" font-weight="600" fill="#ffffff" letter-spacing="-3" filter="url(#glow)">ANcpLua</text>
 
-  <!-- Brand name - premium typography -->
-  <text x="100" y="300" font-family="SF Pro Display, -apple-system, BlinkMacSystemFont, system-ui, sans-serif" font-size="80" font-weight="600" fill="#ffffff" letter-spacing="-2" filter="url(#glow)">ANcpLua</text>
-
-  <!-- Tagline -->
-  <text x="100" y="370" font-family="SF Pro Text, -apple-system, BlinkMacSystemFont, system-ui, sans-serif" font-size="28" font-weight="400" fill="#a1a1aa" letter-spacing="0.5">.NET SDK · Analyzers · Polyfills</text>
-
-  <!-- Subtle descriptor -->
-  <text x="100" y="420" font-family="SF Pro Text, -apple-system, BlinkMacSystemFont, system-ui, sans-serif" font-size="18" font-weight="300" fill="#71717a" letter-spacing="0.3">Modern development for .NET 10</text>
-
-  <!-- Accent line -->
-  <rect x="100" y="450" width="80" height="3" rx="1.5" fill="#06b6d4" opacity="0.8"/>
-
-  <!-- Grain overlay for texture -->
-  <rect width="1200" height="630" fill="transparent" filter="url(#grain)" opacity="0.5"/>
+  <!-- Grain overlay -->
+  <rect width="1200" height="630" fill="transparent" filter="url(#grain)" opacity="0.4"/>
 </svg>
