@@ -12,6 +12,18 @@
     "light": "/logo/light.svg",
     "dark": "/logo/dark.svg"
   },
+  "metadata": {
+    "og:site_name": "ANcpLua Framework Documentation",
+    "og:type": "website",
+    "og:locale": "en_US",
+    "twitter:card": "summary_large_image"
+  },
+  "search": {
+    "prompt": "Search SDK, analyzers, utilities..."
+  },
+  "seo": {
+    "indexing": "navigable"
+  },
   "api": {
     "playground": {
       "mode": "show"
@@ -144,10 +156,68 @@
       }
     ]
   },
-    "footer": {
+  "footer": {
     "socials": {
       "github": "https://github.com/ANcpLua"
     }
-  }
+  },
+  "feedback": {
+    "thumbsRating": true,
+    "suggestEdit": true,
+    "raiseIssue": true
+  },
+  "errors": {
+    "404": {
+      "redirect": false,
+      "title": "Page Not Found",
+      "description": "The page you're looking for doesn't exist or has been moved. Try the [documentation home](/index) to get started, or use the **search bar** above to find what you need."
+    }
+  },
+  "redirects": [
+    {
+      "source": "/introduction",
+      "destination": "/index"
+    },
+    {
+      "source": "/getting-started",
+      "destination": "/quickstart"
+    },
+    {
+      "source": "/sdk",
+      "destination": "/sdk/overview"
+    },
+    {
+      "source": "/analyzers",
+      "destination": "/analyzers/overview"
+    },
+    {
+      "source": "/utilities",
+      "destination": "/utilities/overview"
+    },
+    {
+      "source": "/rules/:slug*",
+      "destination": "/analyzers/rules/:slug*"
+    },
+    {
+      "source": "/analyzer/:slug*",
+      "destination": "/analyzers/:slug*"
+    },
+    {
+      "source": "/api",
+      "destination": "/api-reference/introduction"
+    },
+    {
+      "source": "/api-reference",
+      "destination": "/api-reference/introduction"
+    },
+    {
+      "source": "/roslyn",
+      "destination": "/utilities/overview"
+    },
+    {
+      "source": "/roslyn/:slug*",
+      "destination": "/utilities/:slug*"
+    }
+  ]
 }
 

@@ -1,12 +1,12 @@
 ---
 title: "Quickstart"
-description: "Add ANcpLua.NET.Sdk to your project"
+description: "Install ANcpLua.NET.Sdk in minutes. Configure your .NET project with analyzers, polyfills, and opinionated defaults using global.json and MSBuild."
 ---
 
 ## Prerequisites
 
-- .NET SDK 8.0+
-- Central Package Management enabled
+<Check>**.NET SDK 8.0+** installed</Check>
+<Check>**Central Package Management** enabled in your repository</Check>
 
 ```xml title="Directory.Packages.props"
 <Project>
@@ -18,53 +18,59 @@ description: "Add ANcpLua.NET.Sdk to your project"
 
 ## Installation
 
-**1. Add SDK reference:**
+<Steps>
+  <Step title="Add SDK reference">
+    Add the SDK to your `global.json` file:
 
-```json title="global.json"
-{
-  "msbuild-sdks": {
-    "ANcpLua.NET.Sdk": "1.3.31"
-  }
-}
-```
+    ```json title="global.json"
+    {
+      "msbuild-sdks": {
+        "ANcpLua.NET.Sdk": "1.3.31"
+      }
+    }
+    ```
+  </Step>
+  <Step title="Update project file">
+    Replace your project's `Sdk` attribute with the appropriate SDK:
 
-**2. Update project file:**
+    <Tabs>
+      <Tab title="Library/Console">
+    ```xml
+    <Project Sdk="ANcpLua.NET.Sdk">
+      <PropertyGroup>
+        <TargetFramework>net10.0</TargetFramework>
+      </PropertyGroup>
+    </Project>
+    ```
+      </Tab>
+      <Tab title="Web API">
+    ```xml
+    <Project Sdk="ANcpLua.NET.Sdk.Web">
+      <PropertyGroup>
+        <TargetFramework>net10.0</TargetFramework>
+      </PropertyGroup>
+    </Project>
+    ```
+      </Tab>
+      <Tab title="Tests">
+    ```xml
+    <Project Sdk="ANcpLua.NET.Sdk.Test">
+      <PropertyGroup>
+        <TargetFramework>net10.0</TargetFramework>
+      </PropertyGroup>
+    </Project>
+    ```
+      </Tab>
+    </Tabs>
+  </Step>
+  <Step title="Build">
+    Build your project to verify the SDK is configured correctly:
 
-<Tabs>
-  <Tab title="Library/Console">
-```xml
-<Project Sdk="ANcpLua.NET.Sdk">
-  <PropertyGroup>
-    <TargetFramework>net10.0</TargetFramework>
-  </PropertyGroup>
-</Project>
-```
-  </Tab>
-  <Tab title="Web API">
-```xml
-<Project Sdk="ANcpLua.NET.Sdk.Web">
-  <PropertyGroup>
-    <TargetFramework>net10.0</TargetFramework>
-  </PropertyGroup>
-</Project>
-```
-  </Tab>
-  <Tab title="Tests">
-```xml
-<Project Sdk="ANcpLua.NET.Sdk.Test">
-  <PropertyGroup>
-    <TargetFramework>net10.0</TargetFramework>
-  </PropertyGroup>
-</Project>
-```
-  </Tab>
-</Tabs>
-
-**3. Build:**
-
-```bash
-dotnet build
-```
+    ```bash
+    dotnet build
+    ```
+  </Step>
+</Steps>
 
 ## Auto-Configured
 

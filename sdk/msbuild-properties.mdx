@@ -6,6 +6,27 @@ icon: "cube"
 
 Complete reference of all MSBuild properties available in ANcpLua.NET.Sdk.
 
+<CardGroup cols={2}>
+  <Card title="Build Configuration" icon="gear" href="#build-configuration">
+    Language version, nullable types, and build settings
+  </Card>
+  <Card title="Source Control" icon="code-branch" href="#source-control--sourcelink">
+    SourceLink and repository metadata
+  </Card>
+  <Card title="Package Management" icon="box" href="#package-management">
+    Central Package Management and NuGet audit
+  </Card>
+  <Card title="Code Injection" icon="syringe" href="#code-injection">
+    Polyfills, shared code, and extensions
+  </Card>
+  <Card title="Analyzers" icon="magnifying-glass" href="#analyzer-configuration">
+    Built-in .NET analyzers configuration
+  </Card>
+  <Card title="Usage Examples" icon="code" href="#usage-examples">
+    Common configuration patterns
+  </Card>
+</CardGroup>
+
 ## Build Configuration
 
 <ResponseField name="LangVersion" type="string" default="latest">
@@ -172,36 +193,42 @@ All polyfills default to `false` and are opt-in. Set to `true` to inject.
 
 ## Usage Examples
 
-### Enable All Polyfills for netstandard2.0
+<AccordionGroup>
+  <Accordion title="Polyfill Configuration" icon="puzzle-piece">
+    Use `InjectAllPolyfillsOnLegacy` to enable all polyfills at once, or enable specific ones individually.
 
-```xml
-<PropertyGroup>
-  <TargetFramework>netstandard2.0</TargetFramework>
-  <InjectAllPolyfillsOnLegacy>true</InjectAllPolyfillsOnLegacy>
-</PropertyGroup>
-```
+    <CodeGroup>
+    ```xml Enable All Polyfills
+    <PropertyGroup>
+      <TargetFramework>netstandard2.0</TargetFramework>
+      <InjectAllPolyfillsOnLegacy>true</InjectAllPolyfillsOnLegacy>
+    </PropertyGroup>
+    ```
 
-### Enable Specific Polyfills
+    ```xml Enable Specific Polyfills
+    <PropertyGroup>
+      <InjectIndexRangeOnLegacy>true</InjectIndexRangeOnLegacy>
+      <InjectIsExternalInitOnLegacy>true</InjectIsExternalInitOnLegacy>
+    </PropertyGroup>
+    ```
+    </CodeGroup>
+  </Accordion>
 
-```xml
-<PropertyGroup>
-  <InjectIndexRangeOnLegacy>true</InjectIndexRangeOnLegacy>
-  <InjectIsExternalInitOnLegacy>true</InjectIsExternalInitOnLegacy>
-</PropertyGroup>
-```
+  <Accordion title="Code Injection Options" icon="toggle-off">
+    Disable auto-generated code or shared utilities when not needed.
 
-### Disable CLAUDE.md Generation
+    <CodeGroup>
+    ```xml Disable CLAUDE.md Generation
+    <PropertyGroup>
+      <GenerateClaudeMd>false</GenerateClaudeMd>
+    </PropertyGroup>
+    ```
 
-```xml
-<PropertyGroup>
-  <GenerateClaudeMd>false</GenerateClaudeMd>
-</PropertyGroup>
-```
-
-### Disable Source Guard Injection
-
-```xml
-<PropertyGroup>
-  <InjectSharedThrow>false</InjectSharedThrow>
-</PropertyGroup>
-```
+    ```xml Disable Throw Guards
+    <PropertyGroup>
+      <InjectSharedThrow>false</InjectSharedThrow>
+    </PropertyGroup>
+    ```
+    </CodeGroup>
+  </Accordion>
+</AccordionGroup>
