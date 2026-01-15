@@ -1,10 +1,22 @@
 ---
-title: 'ANcpLua.NET.Sdk'
+title: 'ANcpLua Framework'
 sidebarTitle: 'Overview'
-description: 'MSBuild SDK with Roslyn analyzers, polyfills, and sensible defaults for .NET 10.'
+description: 'MSBuild SDK, Roslyn analyzers, and utilities for .NET 10 development.'
 ---
 
-## Install
+<CardGroup cols={3}>
+  <Card title="SDK" icon="cube" href="/sdk/overview">
+    MSBuild SDK with sensible defaults
+  </Card>
+  <Card title="Analyzers" icon="magnifying-glass" href="/analyzers/overview">
+    Roslyn analyzers for code quality
+  </Card>
+  <Card title="Utilities" icon="wrench" href="/utilities/overview">
+    Roslyn development utilities
+  </Card>
+</CardGroup>
+
+## Quick Start
 
 ```json title="global.json"
 {
@@ -24,48 +36,20 @@ description: 'MSBuild SDK with Roslyn analyzers, polyfills, and sensible default
 
 ## SDK Variants
 
-| SDK                    | Use Case                                                                                                                              | Docs                               |
-| ---------------------- | ------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------- |
-| `ANcpLua.NET.Sdk`      | Libraries, Console, Workers                                                                                                           | [Overview](/sdk/overview)          |
-| `ANcpLua.NET.Sdk.Web`  | ASP.NET Core APIs                                                                                                                     | [Web variant](/sdk/variants#web)   |
-| `ANcpLua.NET.Sdk.Test` | xUnit v3 with [Microsoft Testing Platform](https://learn.microsoft.com/en-us/dotnet/core/testing/microsoft-testing-platform-overview) | [Test variant](/sdk/variants#test) |
+| SDK                    | Use Case               | Docs                               |
+| ---------------------- | ---------------------- | ---------------------------------- |
+| `ANcpLua.NET.Sdk`      | Libraries, Console     | [Overview](/sdk/overview)          |
+| `ANcpLua.NET.Sdk.Web`  | ASP.NET Core APIs      | [Web variant](/sdk/variants#web)   |
+| `ANcpLua.NET.Sdk.Test` | xUnit v3 test projects | [Test variant](/sdk/variants#test) |
 
-## Included
-
-**All variants:**
+## What's Included
 
 - [Roslyn analyzers](/analyzers/overview) for code quality
-- [Banned APIs](/sdk/banned-apis) enforcement (legacy → modern)
+- [Banned APIs](/sdk/banned-apis) enforcement
 - `Throw.IfNull()` guard clauses
-- LangVersion `latest`, nullable enabled
-- [Polyfills](/sdk/polyfills) for netstandard2.0 targets
-
-**Web variant adds:**
-
-- OpenTelemetry integration (logging, metrics, tracing)
-- Health endpoints (`/health`, `/alive`)
-- HTTP resilience via Polly
-
-**Test variant adds:**
-
-- xUnit v3 with Microsoft Testing Platform
-- Code coverage collection
-
-## Requirements
+- [Polyfills](/sdk/polyfills) for netstandard2.0
 
 <Warning>
-  **Central Package Management required.** Create this file if you don't have
-  it:
+  **Central Package Management required.** See [quickstart](/quickstart) for
+  setup.
 </Warning>
-
-```xml title="Directory.Packages.props"
-<Project>
-  <PropertyGroup>
-    <ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
-  </PropertyGroup>
-</Project>
-```
-
-<Card title="Get started" icon="rocket" href="/quickstart">
-  Step-by-step installation guide
-</Card>
