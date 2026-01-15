@@ -1,30 +1,47 @@
 ---
-title: Testing Infrastructure
-description: Base classes and utilities for testing
-icon: "cube"
+title: 'Testing'
+description: 'Base classes for integration and Kestrel tests.'
+icon: 'flask'
 ---
 
-
-The SDK provides base classes and utilities for testing.
-
-## FakeLoggerExtensions
+The Test SDK (`ANcpLua.NET.Sdk.Test`) injects base classes for integration testing.
 
 ## IntegrationTestBase
 
-Fast integration test base using in-memory TestServer.
-Use for most API tests. SDK auto-injects this.
+In-memory TestServer for fast API testing.
 
 ```csharp
-public abstract class IntegrationTestBase<TProgram> : IClassFixture<WebApplicationFactory<TProgram>>, IAsyncLifetime
-    where TProgram : class
+public class MyApiTests : IntegrationTestBase<Program>
+{
+    [Fact]
+    public async Task Get_ReturnsSuccess()
+    {
+        var response = await Client.GetAsync("/api/items");
+        response.EnsureSuccessStatusCode();
+    }
+}
 ```
+
+Uses `WebApplicationFactory<TProgram>` internally.
 
 ## KestrelTestBase
 
-Real Kestrel test base for HTTP/2, WebSockets, SSE, Playwright.
-SDK auto-injects this. Uses UseKestrel(0) + StartServer().
+Real Kestrel server for HTTP/2, WebSockets, SSE, or Playwright.
 
 ```csharp
-public abstract class KestrelTestBase<TProgram> : IAsyncLifetime
-    where TProgram : class
+public class WebSocketTests : KestrelTestBase<Program>
+{
+    [Fact]
+    public async Task WebSocket_ConnectsSuccessfully()
+    {
+        var ws = new ClientWebSocket();
+        await ws.ConnectAsync(new Uri($"{BaseAddress}/ws"), CancellationToken.None);
+    }
+}
 ```
+
+Starts on random port via `UseKestrel(0)`.
+
+## FakeLogger
+
+See [Extensions](/sdk/extensions) for `FakeLogCollector` test helpers.

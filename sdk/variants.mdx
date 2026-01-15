@@ -1,71 +1,43 @@
 ---
-title: SDK Variants
-description: Three SDK variants for different project types
-icon: "cube"
+title: 'SDK Variants'
+description: 'Three SDK variants for different project types.'
+icon: 'cube'
 ---
 
+Choose the variant that matches your project type. See [Quickstart](/quickstart) for installation.
 
-ANcpLua.NET.Sdk provides three SDK variants for different project types.
+| Variant                | Use case                         |
+| ---------------------- | -------------------------------- |
+| `ANcpLua.NET.Sdk`      | Libraries, console apps, workers |
+| `ANcpLua.NET.Sdk.Web`  | ASP.NET Core APIs                |
+| `ANcpLua.NET.Sdk.Test` | xUnit v3 test projects           |
 
-| Variant | Description |
-|---------|-------------|
-| `ANcpLua.NET.Sdk` | Base SDK for libraries, console apps, and workers |
-| `ANcpLua.NET.Sdk.Web` | Web SDK extending `Microsoft.NET.Sdk.Web` with service defaults |
-| `ANcpLua.NET.Sdk.Test` | Test SDK with xUnit v3 MTP auto-injection |
+## Base
 
-## Usage
+All variants include:
 
-### Base SDK (Libraries/Console)
+- [Roslyn analyzers](/analyzers/overview)
+- [Banned APIs](/sdk/banned-apis) enforcement
+- [Guard clauses](/sdk/shared-utilities) (`Throw.IfNull()`)
+- Nullable enabled, LangVersion `latest`
+- Deterministic builds, SourceLink
 
-```xml
-<Project Sdk="ANcpLua.NET.Sdk">
-  <PropertyGroup>
-    <TargetFramework>net10.0</TargetFramework>
-  </PropertyGroup>
-</Project>
-```
+## Web
 
-### Web SDK (ASP.NET Core)
+Extends the base SDK with:
 
-```xml
-<Project Sdk="ANcpLua.NET.Sdk.Web">
-  <PropertyGroup>
-    <TargetFramework>net10.0</TargetFramework>
-  </PropertyGroup>
-</Project>
-```
+- OpenTelemetry (logging, metrics, tracing)
+- Health endpoints (`/health`, `/alive`)
+- HTTP resilience via Polly
+- DevLogs (browser → server logging)
 
-### Test SDK
+See [Service Defaults](/sdk/service-defaults) for configuration.
 
-```xml
-<Project Sdk="ANcpLua.NET.Sdk.Test">
-  <PropertyGroup>
-    <TargetFramework>net10.0</TargetFramework>
-  </PropertyGroup>
-</Project>
-```
+## Test
 
-## What Each Variant Provides
+Extends the base SDK with:
 
-### ANcpLua.NET.Sdk (Base)
-
-- **Analyzers**: ANcpLua.Analyzers, Meziantou.Analyzer, BannedApiAnalyzers
-- **Banned APIs**: See [Banned APIs](/sdk/banned-apis) for the full list
-- **Guard Clauses**: `Throw.IfNull()` (opt-out: `InjectSharedThrow=false`)
-- **AI Support**: CLAUDE.md generation (opt-out: `GenerateClaudeMd=false`)
-- **Build Settings**: Nullable, ImplicitUsings, Deterministic, SourceLink
-
-### ANcpLua.NET.Sdk.Web (adds)
-
-- **OpenTelemetry**: Logging, metrics, tracing with OTLP export
-- **Health Endpoints**: `/health` and `/alive`
-- **HTTP Resilience**: Retries and circuit breakers
-- **DevLogs**: Browser console to server logs
-- **See**: [Service Defaults](/sdk/service-defaults) for full configuration
-
-### ANcpLua.NET.Sdk.Test (adds)
-
-- **xUnit v3 MTP**: Microsoft Testing Platform runner
-- **AwesomeAssertions**: Fluent assertion library
-- **Integration Testing**: WebApplicationFactory base classes
-- **Analyzer Testing**: Microsoft.CodeAnalysis.Testing packages
+- xUnit v3 with [Microsoft Testing Platform](https://learn.microsoft.com/en-us/dotnet/core/testing/microsoft-testing-platform-overview)
+- AwesomeAssertions
+- WebApplicationFactory base classes
+- Analyzer testing packages

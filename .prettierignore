@@ -1,0 +1,16 @@
+# Dependencies
+node_modules/
+
+# Build output
+.mintlify/
+dist/
+
+# Git
+.git/
+
+# IDE
+.idea/
+.vscode/
+
+# Generated files
+llms.txt

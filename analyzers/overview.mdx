@@ -1,97 +1,66 @@
 ---
-title: ANcpLua.Analyzers
-description: "What is ANcpLua.Analyzers? Custom Roslyn analyzers and code fixes that enforce C# code quality, design patterns, and best practices"
-icon: "shield-check"
+title: 'Analyzers'
+sidebarTitle: 'Overview'
+description: 'Roslyn analyzers for code quality and bug prevention.'
+icon: 'shield-check'
 ---
 
+ANcpLua.Analyzers enforces code quality and prevents common bugs. Included automatically with [ANcpLua.NET.Sdk](/sdk/overview).
 
-ANcpLua.Analyzers is a collection of custom Roslyn analyzers and code fixes that enforce code quality, prevent common bugs, and promote consistent coding patterns in C# projects. These analyzers are automatically included when you use [ANcpLua.NET.Sdk](/sdk/overview).
+## Categories
 
-## What Categories of Rules Are Available?
+| Category          | Rules | Examples                                           |
+| ----------------- | ----- | -------------------------------------------------- |
+| Design            | 4     | Primary constructor patterns, type partialness     |
+| Usage             | 6     | Span comparisons, IXmlSerializable, static lambdas |
+| Style             | 3     | Pattern matching, null-guard normalization         |
+| ASP.NET Core      | 5     | Form binding, parameter validation                 |
+| OpenTelemetry     | 2     | Semantic conventions, schema URLs                  |
+| Threading         | 1     | Lock statement best practices                      |
+| Reliability       | 1     | Division by zero prevention                        |
+| VersionManagement | 1     | Hardcoded package version detection                |
 
-| Category | Rule Count | Description |
-|----------|------------|-------------|
-| **Design** | 4 | Primary constructor patterns, type partialness |
-| **Usage** | 6 | Span comparisons, IXmlSerializable, static lambdas |
-| **Style** | 3 | Pattern matching, null-guard normalization |
-| **ASP.NET Core** | 5 | Form binding, parameter validation |
-| **OpenTelemetry** | 2 | Semantic conventions, schema URLs |
-| **Threading** | 1 | Lock statement best practices |
-| **Reliability** | 1 | Division by zero prevention |
-| **VersionManagement** | 1 | Hardcoded package version detection |
+## Rules
 
-## All Rules
+| Id                                | Category          | Description                                             | Severity | Fix |
+| --------------------------------- | ----------------- | ------------------------------------------------------- | :------: | :-: |
+| [AL0001](/analyzers/rules/AL0001) | Design            | Prohibit reassignment of primary constructor parameters |  Error   |  -  |
+| [AL0002](/analyzers/rules/AL0002) | Design            | Don't repeat negated patterns                           | Warning  | Yes |
+| [AL0003](/analyzers/rules/AL0003) | Reliability       | Don't divide by constant zero                           |  Error   |  -  |
+| [AL0004](/analyzers/rules/AL0004) | Usage             | Use pattern matching for Span constants                 | Warning  | Yes |
+| [AL0005](/analyzers/rules/AL0005) | Usage             | Use SequenceEqual for Span non-constants                | Warning  | Yes |
+| [AL0006](/analyzers/rules/AL0006) | Design            | Field name conflicts with primary constructor           | Warning  |  -  |
+| [AL0007](/analyzers/rules/AL0007) | Usage             | GetSchema should be explicitly implemented              |  Error   |  -  |
+| [AL0008](/analyzers/rules/AL0008) | Usage             | GetSchema must return null                              |  Error   | Yes |
+| [AL0009](/analyzers/rules/AL0009) | Usage             | Don't call IXmlSerializable.GetSchema                   |  Error   |  -  |
+| [AL0010](/analyzers/rules/AL0010) | Design            | Type should be partial                                  |   Info   | Yes |
+| [AL0011](/analyzers/rules/AL0011) | Threading         | Avoid lock on non-Lock types                            | Warning  |  -  |
+| [AL0012](/analyzers/rules/AL0012) | OpenTelemetry     | Deprecated semantic convention                          | Warning  | Yes |
+| [AL0013](/analyzers/rules/AL0013) | OpenTelemetry     | Missing telemetry schema URL                            |   Info   |  -  |
+| [AL0014](/analyzers/rules/AL0014) | Style             | Prefer pattern matching for null/zero                   |   Info   | Yes |
+| [AL0015](/analyzers/rules/AL0015) | Style             | Normalize null-guard style                              |   Info   | Yes |
+| [AL0016](/analyzers/rules/AL0016) | Style             | Combine declaration with null-check                     |   Info   | Yes |
+| [AL0017](/analyzers/rules/AL0017) | VersionManagement | Hardcoded package version                               | Warning  |  -  |
+| [AL0020](/analyzers/rules/AL0020) | ASP.NET Core      | IFormCollection requires explicit attribute             |  Error   |  -  |
+| [AL0021](/analyzers/rules/AL0021) | ASP.NET Core      | Multiple structured form sources                        |  Error   |  -  |
+| [AL0022](/analyzers/rules/AL0022) | ASP.NET Core      | Mixed form collection and DTO                           |  Error   |  -  |
+| [AL0023](/analyzers/rules/AL0023) | ASP.NET Core      | Unsupported form type                                   |  Error   |  -  |
+| [AL0024](/analyzers/rules/AL0024) | ASP.NET Core      | Form and body conflict                                  |  Error   |  -  |
+| [AL0025](/analyzers/rules/AL0025) | Usage             | Anonymous function can be static                        |   Info   | Yes |
 
-|Id|Category|Description|Severity|Enabled|Code Fix|
-|--|--------|-----------|:------:|:-----:|:------:|
-|[AL0001](/analyzers/rules/AL0001)|Design|Prohibit reassignment of primary constructor parameters|Error|Yes|No|
-|[AL0002](/analyzers/rules/AL0002)|Design|Don't repeat negated patterns|Warning|Yes|Yes|
-|[AL0003](/analyzers/rules/AL0003)|Reliability|Don't divide by constant zero|Error|Yes|No|
-|[AL0004](/analyzers/rules/AL0004)|Usage|Use pattern matching when comparing Span with constants|Warning|Yes|Yes|
-|[AL0005](/analyzers/rules/AL0005)|Usage|Use SequenceEqual when comparing Span with non-constants|Warning|Yes|Yes|
-|[AL0006](/analyzers/rules/AL0006)|Design|Field name conflicts with primary constructor parameter|Warning|Yes|No|
-|[AL0007](/analyzers/rules/AL0007)|Usage|GetSchema should be explicitly implemented|Error|Yes|No|
-|[AL0008](/analyzers/rules/AL0008)|Usage|GetSchema must return null and not be abstract|Error|Yes|Yes|
-|[AL0009](/analyzers/rules/AL0009)|Usage|Don't call IXmlSerializable.GetSchema|Error|Yes|No|
-|[AL0010](/analyzers/rules/AL0010)|Design|Type should be partial|Info|No|Yes|
-|[AL0011](/analyzers/rules/AL0011)|Threading|Avoid lock keyword on non-Lock types|Warning|Yes|No|
-|[AL0012](/analyzers/rules/AL0012)|OpenTelemetry|Deprecated semantic convention attribute|Warning|Yes|Yes|
-|[AL0013](/analyzers/rules/AL0013)|OpenTelemetry|Missing telemetry schema URL|Info|Yes|No|
-|[AL0014](/analyzers/rules/AL0014)|Style|Prefer pattern matching for null and zero comparisons|Info|Yes|Yes|
-|[AL0015](/analyzers/rules/AL0015)|Style|Normalize null-guard style|Info|Yes|Yes|
-|[AL0016](/analyzers/rules/AL0016)|Style|Combine declaration with subsequent null-check|Info|Yes|Yes|
-|[AL0017](/analyzers/rules/AL0017)|VersionManagement|Hardcoded package version detected|Warning|Yes|No|
-|[AL0020](/analyzers/rules/AL0020)|ASP.NET Core|IFormCollection requires explicit attribute|Error|Yes|No|
-|[AL0021](/analyzers/rules/AL0021)|ASP.NET Core|Multiple structured form sources|Error|Yes|No|
-|[AL0022](/analyzers/rules/AL0022)|ASP.NET Core|Mixed form collection and DTO|Error|Yes|No|
-|[AL0023](/analyzers/rules/AL0023)|ASP.NET Core|Unsupported form type|Error|Yes|No|
-|[AL0024](/analyzers/rules/AL0024)|ASP.NET Core|Form and body conflict|Error|Yes|No|
-|[AL0025](/analyzers/rules/AL0025)|Usage|Anonymous function can be made static|Info|Yes|Yes|
+## Refactorings
 
+| Id                                | Description               |
+| --------------------------------- | ------------------------- |
+| [AR0001](/analyzers/rules/AR0001) | Snake case to Pascal case |
+| [AR0002](/analyzers/rules/AR0002) | Make static lambda        |
 
-## What Refactorings Are Included?
+## Configuration
 
-|Id|Description|
-|--|-----------|
-|[AR0001](/analyzers/rules/AR0001)|Snake Case To Pascal Case|
-|[AR0002](/analyzers/rules/AR0002)|Make Static Lambda|
-
-## How Do I Configure the Analyzers?
-
-All rules can be configured via `.editorconfig`. See [Configuration](/analyzers/configuration) for detailed settings.
-
-Example configuration:
+Configure via `.editorconfig`. See [Configuration](/analyzers/configuration).
 
 ```ini
-# .editorconfig
 [*.cs]
-# Change AL0014 from Info to Warning
 dotnet_diagnostic.AL0014.severity = warning
-
-# Disable AL0010 (Type should be partial)
 dotnet_diagnostic.AL0010.severity = none
 ```
-
-## Common Questions
-
-<AccordionGroup>
-  <Accordion title="Are these analyzers automatically included with the SDK?">
-    Yes. When you use `ANcpLua.NET.Sdk`, `ANcpLua.NET.Sdk.Web`, or `ANcpLua.NET.Sdk.Test`, the analyzers are automatically added to your project. You do not need to install them separately.
-  </Accordion>
-
-  <Accordion title="How do I disable a specific analyzer rule?">
-    Add a rule to your `.editorconfig` file with severity `none`. For example: `dotnet_diagnostic.AL0010.severity = none`. See [Configuration](/analyzers/configuration) for all options.
-  </Accordion>
-
-  <Accordion title="Can I use ANcpLua.Analyzers without the SDK?">
-    Yes. Install the `ANcpLua.Analyzers` NuGet package directly: `dotnet add package ANcpLua.Analyzers`. However, using the SDK provides additional benefits like polyfills and banned API enforcement.
-  </Accordion>
-
-  <Accordion title="What is the difference between Warning and Error severity?">
-    Warnings appear in the build output but do not fail the build. Errors cause the build to fail. Rules like AL0001 (primary constructor reassignment) and AL0003 (division by zero) are errors because they indicate definite bugs.
-  </Accordion>
-
-  <Accordion title="Which rules have code fixes?">
-    Rules with "Yes" in the Code Fix column can be automatically fixed via IDE quick actions or `dotnet format`. This includes style rules (AL0014, AL0015, AL0016), pattern matching (AL0002, AL0004, AL0005), and IXmlSerializable (AL0008).
-  </Accordion>
-</AccordionGroup>

@@ -1,152 +1,70 @@
 ---
-title: Configuration
-description: Configure ANcpLua.Analyzers via .editorconfig
-icon: "shield-check"
+title: 'Configuration'
+description: 'Configure analyzer rules via .editorconfig.'
+icon: 'sliders'
 ---
 
+All rules are configured via `.editorconfig` using `dotnet_diagnostic.<RuleId>.severity`.
 
-## Default Configuration
+## Severity Levels
 
-```editorconfig
-# AL0001: Prohibit reassignment of primary constructor parameters
-dotnet_diagnostic.AL0001.severity = error
+| Level        | Build    | Description                    |
+| ------------ | -------- | ------------------------------ |
+| `error`      | Fails    | Must fix before build succeeds |
+| `warning`    | Warns    | Shows in output, doesn't fail  |
+| `suggestion` | IDE only | Shows in editor, not in build  |
+| `none`       | Disabled | Rule is off                    |
 
-# AL0002: Don't repeat negated patterns
-dotnet_diagnostic.AL0002.severity = warning
+## Defaults
 
-# AL0003: Don't divide by constant zero
-dotnet_diagnostic.AL0003.severity = error
+```ini
+[*.cs]
+# Errors - bugs that must be fixed
+dotnet_diagnostic.AL0001.severity = error  # Primary constructor reassignment
+dotnet_diagnostic.AL0003.severity = error  # Division by zero
+dotnet_diagnostic.AL0007.severity = error  # GetSchema explicit implementation
+dotnet_diagnostic.AL0008.severity = error  # GetSchema returns null
+dotnet_diagnostic.AL0009.severity = error  # Don't call GetSchema
+dotnet_diagnostic.AL0020.severity = error  # IFormCollection attribute
+dotnet_diagnostic.AL0021.severity = error  # Multiple form sources
+dotnet_diagnostic.AL0022.severity = error  # Mixed form collection/DTO
+dotnet_diagnostic.AL0023.severity = error  # Unsupported form type
+dotnet_diagnostic.AL0024.severity = error  # Form/body conflict
 
-# AL0004: Use pattern matching when comparing Span with constants
-dotnet_diagnostic.AL0004.severity = warning
+# Warnings - should fix
+dotnet_diagnostic.AL0002.severity = warning  # Repeated negated patterns
+dotnet_diagnostic.AL0004.severity = warning  # Span pattern matching
+dotnet_diagnostic.AL0005.severity = warning  # Span SequenceEqual
+dotnet_diagnostic.AL0006.severity = warning  # Field/parameter name conflict
+dotnet_diagnostic.AL0011.severity = warning  # Lock on non-Lock
+dotnet_diagnostic.AL0012.severity = warning  # Deprecated OTel convention
+dotnet_diagnostic.AL0017.severity = warning  # Hardcoded version
 
-# AL0005: Use SequenceEqual when comparing Span with non-constants
-dotnet_diagnostic.AL0005.severity = warning
+# Suggestions - style preferences
+dotnet_diagnostic.AL0013.severity = suggestion  # Missing schema URL
+dotnet_diagnostic.AL0014.severity = suggestion  # Pattern matching style
+dotnet_diagnostic.AL0015.severity = suggestion  # Null-guard style
+dotnet_diagnostic.AL0016.severity = suggestion  # Declaration + null-check
+dotnet_diagnostic.AL0025.severity = suggestion  # Static lambda
 
-# AL0006: Field name conflicts with primary constructor parameter
-dotnet_diagnostic.AL0006.severity = warning
+# Disabled by default
+dotnet_diagnostic.AL0010.severity = none  # Type should be partial
+```
 
-# AL0007: GetSchema should be explicitly implemented
-dotnet_diagnostic.AL0007.severity = error
+## Disable a Rule
 
-# AL0008: GetSchema must return null and not be abstract
-dotnet_diagnostic.AL0008.severity = error
-
-# AL0009: Don't call IXmlSerializable.GetSchema
-dotnet_diagnostic.AL0009.severity = error
-
-# AL0010: Type should be partial
-dotnet_diagnostic.AL0010.severity = none
-
-# AL0011: Avoid lock keyword on non-Lock types
-dotnet_diagnostic.AL0011.severity = warning
-
-# AL0012: Deprecated semantic convention attribute
-dotnet_diagnostic.AL0012.severity = warning
-
-# AL0013: Missing telemetry schema URL
-dotnet_diagnostic.AL0013.severity = suggestion
-
-# AL0014: Prefer pattern matching for null and zero comparisons
-dotnet_diagnostic.AL0014.severity = suggestion
-
-# AL0015: Normalize null-guard style
-dotnet_diagnostic.AL0015.severity = suggestion
-
-# AL0016: Combine declaration with subsequent null-check
-dotnet_diagnostic.AL0016.severity = suggestion
-
-# AL0017: Hardcoded package version detected
-dotnet_diagnostic.AL0017.severity = warning
-
-# AL0020: IFormCollection requires explicit attribute
-dotnet_diagnostic.AL0020.severity = error
-
-# AL0021: Multiple structured form sources
-dotnet_diagnostic.AL0021.severity = error
-
-# AL0022: Mixed form collection and DTO
-dotnet_diagnostic.AL0022.severity = error
-
-# AL0023: Unsupported form type
-dotnet_diagnostic.AL0023.severity = error
-
-# AL0024: Form and body conflict
-dotnet_diagnostic.AL0024.severity = error
-
-# AL0025: Anonymous function can be made static
-dotnet_diagnostic.AL0025.severity = suggestion
+```ini
+[*.cs]
+dotnet_diagnostic.AL0014.severity = none
 ```
 
 ## Disable All Rules
 
-```editorconfig
-# AL0001: Prohibit reassignment of primary constructor parameters
+```ini
+[*.cs]
 dotnet_diagnostic.AL0001.severity = none
-
-# AL0002: Don't repeat negated patterns
 dotnet_diagnostic.AL0002.severity = none
-
-# AL0003: Don't divide by constant zero
-dotnet_diagnostic.AL0003.severity = none
-
-# AL0004: Use pattern matching when comparing Span with constants
-dotnet_diagnostic.AL0004.severity = none
-
-# AL0005: Use SequenceEqual when comparing Span with non-constants
-dotnet_diagnostic.AL0005.severity = none
-
-# AL0006: Field name conflicts with primary constructor parameter
-dotnet_diagnostic.AL0006.severity = none
-
-# AL0007: GetSchema should be explicitly implemented
-dotnet_diagnostic.AL0007.severity = none
-
-# AL0008: GetSchema must return null and not be abstract
-dotnet_diagnostic.AL0008.severity = none
-
-# AL0009: Don't call IXmlSerializable.GetSchema
-dotnet_diagnostic.AL0009.severity = none
-
-# AL0010: Type should be partial
-dotnet_diagnostic.AL0010.severity = none
-
-# AL0011: Avoid lock keyword on non-Lock types
-dotnet_diagnostic.AL0011.severity = none
-
-# AL0012: Deprecated semantic convention attribute
-dotnet_diagnostic.AL0012.severity = none
-
-# AL0013: Missing telemetry schema URL
-dotnet_diagnostic.AL0013.severity = none
-
-# AL0014: Prefer pattern matching for null and zero comparisons
-dotnet_diagnostic.AL0014.severity = none
-
-# AL0015: Normalize null-guard style
-dotnet_diagnostic.AL0015.severity = none
-
-# AL0016: Combine declaration with subsequent null-check
-dotnet_diagnostic.AL0016.severity = none
-
-# AL0017: Hardcoded package version detected
-dotnet_diagnostic.AL0017.severity = none
-
-# AL0020: IFormCollection requires explicit attribute
-dotnet_diagnostic.AL0020.severity = none
-
-# AL0021: Multiple structured form sources
-dotnet_diagnostic.AL0021.severity = none
-
-# AL0022: Mixed form collection and DTO
-dotnet_diagnostic.AL0022.severity = none
-
-# AL0023: Unsupported form type
-dotnet_diagnostic.AL0023.severity = none
-
-# AL0024: Form and body conflict
-dotnet_diagnostic.AL0024.severity = none
-
-# AL0025: Anonymous function can be made static
-dotnet_diagnostic.AL0025.severity = none
+# ... repeat for each rule
 ```
+
+Or exclude the analyzer package entirely in your project file.

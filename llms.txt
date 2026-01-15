@@ -1,106 +1,69 @@
 # ANcpLua Framework Documentation
 
-> Opinionated .NET SDK with polyfills, analyzers, and best practices for building high-quality applications.
+> MSBuild SDK with Roslyn analyzers, polyfills, and sensible defaults for .NET 10.
 
-This documentation covers the ANcpLua ecosystem: a comprehensive .NET development toolkit providing MSBuild SDKs, custom Roslyn analyzers, and utilities for source generators.
+## Sections
 
-## Main Sections
+- **SDK** (`/sdk/*`): MSBuild SDK configuration, variants, properties
+- **Analyzers** (`/analyzers/*`): 24 diagnostic rules + 2 refactorings
+- **Utilities** (`/utilities/*`): Roslyn utilities for source generators
+- **API** (`/api-reference/*`): qyl observability REST API
 
-- **SDK**: MSBuild SDK with polyfills, analyzers, banned APIs, and opinionated defaults
-- **Analyzers**: 24 diagnostic rules + 2 refactorings for C# code quality
-- **Utilities**: Roslyn utilities for building analyzers and source generators
-- **API**: QYL Observability REST API (44 endpoints for traces, logs, metrics)
+## SDK Variants
 
-## Quick Reference
-
-### SDK Variants
-- `ANcpLua.NET.Sdk` - Base SDK for libraries and console apps
-- `ANcpLua.NET.Sdk.Web` - Web SDK with OpenTelemetry, health endpoints, HTTP resilience
-- `ANcpLua.NET.Sdk.Test` - Test SDK with xUnit v3 and MTP
-
-### Key Features
-- Automatic polyfills for netstandard2.0/net472 (Index/Range, IsExternalInit, TimeProvider)
-- Banned API enforcement (see /sdk/banned-apis for the complete list)
-- Pre-configured analyzers (ANcpLua.Analyzers, Meziantou.Analyzer)
-- Guard clauses via Throw.IfNull()
-- LangVersion latest and nullable enabled by default
-- Deterministic reproducible builds
+| Variant | Use Case |
+|---------|----------|
+| `ANcpLua.NET.Sdk` | Libraries, Console, Workers |
+| `ANcpLua.NET.Sdk.Web` | ASP.NET Core APIs (OpenTelemetry, health endpoints) |
+| `ANcpLua.NET.Sdk.Test` | xUnit v3 with Microsoft Testing Platform |
 
 ## Key Pages
 
 ### Getting Started
-- /index - Framework overview and ecosystem introduction
-- /quickstart - 5-minute setup guide with prerequisites and examples
+- `/index` - Overview and installation
+- `/quickstart` - Step-by-step setup
 
-### ANcpLua.NET.Sdk
-- /sdk/overview - SDK features and quick start
-- /sdk/variants - SDK variant comparison (Base, Web, Test)
-- /sdk/msbuild-properties - All MSBuild configuration properties
-- /sdk/service-defaults - OpenTelemetry and ASP.NET Core service defaults (Web SDK)
-- /sdk/polyfills - Automatic polyfills for legacy frameworks
-- /sdk/extensions - Extension methods provided by SDK
-- /sdk/shared-utilities - Throw guards and utility classes
-- /sdk/banned-apis - Complete list of banned APIs with alternatives
-- /sdk/configuration-files - CLAUDE.md generation and other config files
-- /sdk/testing - IntegrationTestBase and KestrelTestBase classes
+### SDK
+- `/sdk/overview` - Feature summary
+- `/sdk/variants` - Variant comparison
+- `/sdk/msbuild-properties` - All MSBuild properties
+- `/sdk/service-defaults` - Web SDK configuration
+- `/sdk/polyfills` - netstandard2.0 compatibility
+- `/sdk/banned-apis` - Deprecated API enforcement
+- `/sdk/testing` - Test base classes
 
-### ANcpLua.Analyzers
-- /analyzers/overview - Rule summary table with severity and code fix availability
-- /analyzers/configuration - EditorConfig settings for rule configuration
-- /analyzers/rules/index - Complete rule reference organized by category
+### Analyzers
+- `/analyzers/overview` - Rule table with severity
+- `/analyzers/configuration` - EditorConfig settings
+- `/analyzers/rules/AL0001` through `/analyzers/rules/AL0025` - Individual rules
 
-#### Analyzer Rules by Category
-Design: AL0001, AL0002, AL0006, AL0010
-Reliability: AL0003
-Usage: AL0004, AL0005, AL0007, AL0008, AL0009, AL0025
-Threading: AL0011
-OpenTelemetry: AL0012, AL0013
-Style: AL0014, AL0015, AL0016
-Version Management: AL0017
-ASP.NET Core: AL0020, AL0021, AL0022, AL0023, AL0024
-Refactorings: AR0001, AR0002
+### Utilities
+- `/utilities/overview` - Package overview
+- `/utilities/diagnostic-flow` - Railway-oriented diagnostics
+- `/utilities/patterns` - Symbol pattern matching
+- `/utilities/semantic-guard` - Declarative validation
 
-### ANcpLua.Roslyn.Utilities
-- /utilities/overview - Package overview and dependency hierarchy
-- /utilities/diagnostic-flow - Railway-oriented programming for diagnostics
-- /utilities/pipeline - Incremental generator pipeline extensions
-- /utilities/contexts - Domain contexts (Awaitable, AspNet, Disposable, Collection)
-- /utilities/patterns - Symbol pattern matching builders
-- /utilities/operations - IOperation navigation and inspection extensions
-- /utilities/symbols - Symbol extension methods
-- /utilities/codegen - IndentedStringBuilder for code generation
-- /utilities/semantic-guard - Declarative semantic validation
-- /utilities/msbuild-properties - MSBuild properties for utilities package
-- /utilities/msbuild-testing - MSBuild integration testing
-- /utilities/testing - Incremental generator testing framework
+## Navigation Hints
 
-### QYL Observability API
-- /api-reference/introduction - API overview with 44 endpoints
-- Categories: Health, Traces, Logs, Metrics, Sessions, Errors, Exceptions, Deployments, CI/CD, Streaming, Services
-
-## Navigation Hints for AI Tools
-
-When users ask about:
-- "Getting started" or "setup" -> /quickstart
-- "MSBuild properties" or "configuration" -> /sdk/msbuild-properties
-- "Polyfills" or "legacy framework support" -> /sdk/polyfills
-- "Banned APIs" or "time API alternatives" -> /sdk/banned-apis
-- "Analyzer rules" or "AL0XXX" -> /analyzers/rules/index or specific /analyzers/rules/AL0XXX
-- "Source generators" or "Roslyn utilities" -> /utilities/overview
-- "DiagnosticFlow" or "railway" -> /utilities/diagnostic-flow
-- "Testing" or "xUnit" -> /sdk/testing
-- "Web SDK" or "OpenTelemetry" -> /sdk/service-defaults
-- "API" or "observability" or "traces" -> /api-reference/introduction
-
-## External Resources
-
-- NuGet: https://www.nuget.org/profiles/ANcpLua
-- GitHub: https://github.com/ANcpLua
-- ANcpLua.NET.Sdk: https://www.nuget.org/packages/ANcpLua.NET.Sdk
-- ANcpLua.Analyzers: https://www.nuget.org/packages/ANcpLua.Analyzers
-- ANcpLua.Roslyn.Utilities: https://www.nuget.org/packages/ANcpLua.Roslyn.Utilities
+| Query | Page |
+|-------|------|
+| "getting started", "setup" | `/quickstart` |
+| "MSBuild properties" | `/sdk/msbuild-properties` |
+| "polyfills", "netstandard" | `/sdk/polyfills` |
+| "banned APIs", "DateTime" | `/sdk/banned-apis` |
+| "analyzer rules", "AL0XXX" | `/analyzers/rules/AL0XXX` |
+| "source generators" | `/utilities/overview` |
+| "DiagnosticFlow" | `/utilities/diagnostic-flow` |
+| "testing", "xUnit" | `/sdk/testing` |
+| "OpenTelemetry", "web" | `/sdk/service-defaults` |
 
 ## Requirements
 
-- .NET SDK 8.0 or later
-- Central Package Management enabled (ManagePackageVersionsCentrally=true)
+- .NET 10 SDK
+- Central Package Management (`ManagePackageVersionsCentrally=true`)
+
+## External Links
+
+- NuGet: https://www.nuget.org/profiles/ANcpLua
+- GitHub: https://github.com/ANcpLua
+- Live docs: https://ancplua.io

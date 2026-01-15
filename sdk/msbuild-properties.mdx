@@ -1,7 +1,7 @@
 ---
 title: MSBuild Properties Reference
 description: Complete reference of all MSBuild properties available in ANcpLua.NET.Sdk
-icon: "cube"
+icon: 'cube'
 ---
 
 Complete reference of all MSBuild properties available in ANcpLua.NET.Sdk.
@@ -10,7 +10,11 @@ Complete reference of all MSBuild properties available in ANcpLua.NET.Sdk.
   <Card title="Build Configuration" icon="gear" href="#build-configuration">
     Language version, nullable types, and build settings
   </Card>
-  <Card title="Source Control" icon="code-branch" href="#source-control--sourcelink">
+  <Card
+    title="Source Control"
+    icon="code-branch"
+    href="#source-control--sourcelink"
+  >
     SourceLink and repository metadata
   </Card>
   <Card title="Package Management" icon="box" href="#package-management">
@@ -19,7 +23,11 @@ Complete reference of all MSBuild properties available in ANcpLua.NET.Sdk.
   <Card title="Code Injection" icon="syringe" href="#code-injection">
     Polyfills, shared code, and extensions
   </Card>
-  <Card title="Analyzers" icon="magnifying-glass" href="#analyzer-configuration">
+  <Card
+    title="Analyzers"
+    icon="magnifying-glass"
+    href="#analyzer-configuration"
+  >
     Built-in .NET analyzers configuration
   </Card>
   <Card title="Usage Examples" icon="code" href="#usage-examples">
@@ -33,7 +41,11 @@ Complete reference of all MSBuild properties available in ANcpLua.NET.Sdk.
   C# language version. SDK enforces `latest` by default.
 </ResponseField>
 
-<ResponseField name="Nullable" type="enable|disable|warnings|annotations" default="enable">
+<ResponseField
+  name="Nullable"
+  type="enable|disable|warnings|annotations"
+  default="enable"
+>
   Nullable reference types. Enabled by default.
 </ResponseField>
 
@@ -45,11 +57,19 @@ Complete reference of all MSBuild properties available in ANcpLua.NET.Sdk.
   Produce reproducible builds with identical binary output.
 </ResponseField>
 
-<ResponseField name="TreatWarningsAsErrors" type="bool" default="true (CI/Release)">
+<ResponseField
+  name="TreatWarningsAsErrors"
+  type="bool"
+  default="true (CI/Release)"
+>
   Treat all warnings as errors in CI or Release builds.
 </ResponseField>
 
-<ResponseField name="EnforceCodeStyleInBuild" type="bool" default="true (CI/Release)">
+<ResponseField
+  name="EnforceCodeStyleInBuild"
+  type="bool"
+  default="true (CI/Release)"
+>
   Enforce code style rules during build in CI or Release.
 </ResponseField>
 
@@ -67,7 +87,11 @@ Complete reference of all MSBuild properties available in ANcpLua.NET.Sdk.
   Embed source files not tracked by git in the PDB.
 </ResponseField>
 
-<ResponseField name="IncludeSourceRevisionInInformationalVersion" type="bool" default="true">
+<ResponseField
+  name="IncludeSourceRevisionInInformationalVersion"
+  type="bool"
+  default="true"
+>
   Include git commit hash in assembly informational version.
 </ResponseField>
 
@@ -77,7 +101,11 @@ Complete reference of all MSBuild properties available in ANcpLua.NET.Sdk.
   Enable Central Package Management (CPM).
 </ResponseField>
 
-<ResponseField name="CentralPackageTransitivePinningEnabled" type="bool" default="true">
+<ResponseField
+  name="CentralPackageTransitivePinningEnabled"
+  type="bool"
+  default="true"
+>
   Pin transitive package versions centrally.
 </ResponseField>
 
@@ -95,7 +123,11 @@ Complete reference of all MSBuild properties available in ANcpLua.NET.Sdk.
   Audit mode: `direct` for direct dependencies only, `all` for transitive too.
 </ResponseField>
 
-<ResponseField name="NuGetAuditLevel" type="low|moderate|high|critical" default="low">
+<ResponseField
+  name="NuGetAuditLevel"
+  type="low|moderate|high|critical"
+  default="low"
+>
   Minimum vulnerability severity to report.
 </ResponseField>
 
@@ -104,7 +136,8 @@ Complete reference of all MSBuild properties available in ANcpLua.NET.Sdk.
 ### Shared Code
 
 <ResponseField name="InjectSharedThrow" type="bool" default="true">
-  Inject `Throw` guard clause utilities. Provides `Throw.IfNull()`, `Throw.IfNullOrEmpty()`, etc.
+  Inject `Throw` guard clause utilities. Provides `Throw.IfNull()`,
+  `Throw.IfNullOrEmpty()`, etc.
 </ResponseField>
 
 <ResponseField name="GenerateClaudeMd" type="bool" default="true">
@@ -120,7 +153,8 @@ All polyfills default to `false` and are opt-in. Set to `true` to inject.
 </ResponseField>
 
 <ResponseField name="InjectIndexRangeOnLegacy" type="bool" default="false">
-  Index/Range structs for `netstandard2.0` and older TFMs (enables `array[^1]` syntax).
+  Index/Range structs for `netstandard2.0` and older TFMs (enables `array[^1]`
+  syntax).
 </ResponseField>
 
 <ResponseField name="InjectIsExternalInitOnLegacy" type="bool" default="false">
@@ -131,19 +165,35 @@ All polyfills default to `false` and are opt-in. Set to `true` to inject.
   `required` keyword support (pre-.NET 7).
 </ResponseField>
 
-<ResponseField name="InjectNullabilityAttributesOnLegacy" type="bool" default="false">
+<ResponseField
+  name="InjectNullabilityAttributesOnLegacy"
+  type="bool"
+  default="false"
+>
   Nullable reference type attributes (pre-.NET Core 3.1).
 </ResponseField>
 
-<ResponseField name="InjectCallerAttributesOnLegacy" type="bool" default="false">
+<ResponseField
+  name="InjectCallerAttributesOnLegacy"
+  type="bool"
+  default="false"
+>
   `CallerArgumentExpression` attribute (pre-.NET 6).
 </ResponseField>
 
-<ResponseField name="InjectUnreachableExceptionOnLegacy" type="bool" default="false">
+<ResponseField
+  name="InjectUnreachableExceptionOnLegacy"
+  type="bool"
+  default="false"
+>
   `UnreachableException` type (pre-.NET 7).
 </ResponseField>
 
-<ResponseField name="InjectExperimentalAttributeOnLegacy" type="bool" default="false">
+<ResponseField
+  name="InjectExperimentalAttributeOnLegacy"
+  type="bool"
+  default="false"
+>
   `ExperimentalAttribute` (pre-.NET 8).
 </ResponseField>
 
@@ -151,8 +201,13 @@ All polyfills default to `false` and are opt-in. Set to `true` to inject.
   Trimmer/AOT attributes (pre-.NET 5).
 </ResponseField>
 
-<ResponseField name="InjectStringExtensionsPolyfill" type="bool" default="false">
-  String methods with `StringComparison` parameter (fixes CA1307/CA2249 on netstandard2.0).
+<ResponseField
+  name="InjectStringExtensionsPolyfill"
+  type="bool"
+  default="false"
+>
+  String methods with `StringComparison` parameter (fixes CA1307/CA2249 on
+  netstandard2.0).
 </ResponseField>
 
 <ResponseField name="InjectTimeProviderPolyfill" type="bool" default="false">
@@ -194,41 +249,44 @@ All polyfills default to `false` and are opt-in. Set to `true` to inject.
 ## Usage Examples
 
 <AccordionGroup>
-  <Accordion title="Polyfill Configuration" icon="puzzle-piece">
-    Use `InjectAllPolyfillsOnLegacy` to enable all polyfills at once, or enable specific ones individually.
+    <Accordion title="Polyfill Configuration" icon="puzzle-piece">
+        Use `InjectAllPolyfillsOnLegacy` to enable all polyfills at once, or enable specific ones individually.
 
-    <CodeGroup>
-    ```xml Enable All Polyfills
-    <PropertyGroup>
-      <TargetFramework>netstandard2.0</TargetFramework>
-      <InjectAllPolyfillsOnLegacy>true</InjectAllPolyfillsOnLegacy>
-    </PropertyGroup>
-    ```
+        <CodeGroup>
+            ```xml Enable All Polyfills
+            <PropertyGroup>
+                <TargetFramework>netstandard2.0</TargetFramework>
+                <InjectAllPolyfillsOnLegacy>true</InjectAllPolyfillsOnLegacy>
+            </PropertyGroup>
+            ```
 
-    ```xml Enable Specific Polyfills
-    <PropertyGroup>
-      <InjectIndexRangeOnLegacy>true</InjectIndexRangeOnLegacy>
-      <InjectIsExternalInitOnLegacy>true</InjectIsExternalInitOnLegacy>
-    </PropertyGroup>
-    ```
-    </CodeGroup>
-  </Accordion>
+            ```xml Enable Specific Polyfills
+            <PropertyGroup>
+                <InjectIndexRangeOnLegacy>true</InjectIndexRangeOnLegacy>
+                <InjectIsExternalInitOnLegacy>true</InjectIsExternalInitOnLegacy>
+            </PropertyGroup>
+            ```
+        </CodeGroup>
 
-  <Accordion title="Code Injection Options" icon="toggle-off">
-    Disable auto-generated code or shared utilities when not needed.
+    </Accordion>
 
-    <CodeGroup>
-    ```xml Disable CLAUDE.md Generation
-    <PropertyGroup>
-      <GenerateClaudeMd>false</GenerateClaudeMd>
-    </PropertyGroup>
-    ```
+    <Accordion title="Code Injection Options" icon="toggle-off">
+        Disable auto-generated code or shared utilities when not needed.
 
-    ```xml Disable Throw Guards
-    <PropertyGroup>
-      <InjectSharedThrow>false</InjectSharedThrow>
-    </PropertyGroup>
-    ```
-    </CodeGroup>
-  </Accordion>
+        <CodeGroup>
+            ```xml Disable CLAUDE.md Generation
+            <PropertyGroup>
+                <GenerateClaudeMd>false</GenerateClaudeMd>
+            </PropertyGroup>
+            ```
+
+            ```xml Disable Throw Guards
+            <PropertyGroup>
+                <InjectSharedThrow>false</InjectSharedThrow>
+            </PropertyGroup>
+            ```
+        </CodeGroup>
+
+    </Accordion>
+
 </AccordionGroup>

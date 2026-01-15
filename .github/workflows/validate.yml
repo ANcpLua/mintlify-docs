@@ -1,0 +1,97 @@
+name: Validate & Auto-fix
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.head_ref || github.ref_name }}
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Auto-fix formatting
+        id: format
+        run: |
+          npm run format
+          if [[ -n $(git status --porcelain) ]]; then
+            echo "fixed=true" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Commit formatting fixes
+        if: steps.format.outputs.fixed == 'true' && github.event_name == 'push'
+        run: |
+          git config --local user.email "github-actions[bot]@users.noreply.github.com"
+          git config --local user.name "github-actions[bot]"
+          git add -A
+          git commit -m "style: auto-fix formatting [skip ci]"
+          git push
+
+      - name: Check broken links
+        id: broken-links
+        continue-on-error: true
+        run: npx mint broken-links 2>&1 | tee broken-links.log
+
+      - name: Check accessibility
+        id: a11y
+        continue-on-error: true
+        run: npx mint a11y 2>&1 | tee a11y.log
+
+      - name: Check OpenAPI spec
+        id: openapi
+        continue-on-error: true
+        run: npx mint openapi-check api-reference/openapi.yaml 2>&1 | tee openapi.log
+
+      - name: Report issues on PR
+        if: github.event_name == 'pull_request' && (steps.broken-links.outcome == 'failure' || steps.a11y.outcome == 'failure' || steps.openapi.outcome == 'failure')
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            let body = '## Documentation Validation Report\n\n';
+
+            const brokenLinks = fs.existsSync('broken-links.log') ? fs.readFileSync('broken-links.log', 'utf8') : '';
+            const a11y = fs.existsSync('a11y.log') ? fs.readFileSync('a11y.log', 'utf8') : '';
+            const openapi = fs.existsSync('openapi.log') ? fs.readFileSync('openapi.log', 'utf8') : '';
+
+            if ('${{ steps.broken-links.outcome }}' === 'failure') {
+              body += '### Broken Links\n```\n' + brokenLinks.slice(0, 2000) + '\n```\n\n';
+            }
+            if ('${{ steps.a11y.outcome }}' === 'failure') {
+              body += '### Accessibility Issues\n```\n' + a11y.slice(0, 2000) + '\n```\n\n';
+            }
+            if ('${{ steps.openapi.outcome }}' === 'failure') {
+              body += '### OpenAPI Issues\n```\n' + openapi.slice(0, 2000) + '\n```\n\n';
+            }
+
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: body
+            });
+
+      - name: Fail if validation errors
+        if: steps.broken-links.outcome == 'failure' || steps.a11y.outcome == 'failure' || steps.openapi.outcome == 'failure'
+        run: |
+          echo "Validation failed. Check the logs above."
+          exit 1

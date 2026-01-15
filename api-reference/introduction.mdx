@@ -1,41 +1,43 @@
-
 ---
-title: 'QYL API'
-description: 'REST API for observability data'
+title: 'QYL Observability API'
+sidebarTitle: 'Introduction'
+description: 'REST API for traces, logs, metrics, and deployments.'
 ---
 
-44 endpoints for traces, logs, metrics, sessions, errors, and deployments.
+REST API for the qyl observability platform.
+
+**Version:** 2026-01-15
 
 ## Base URLs
 
-| Environment | URL |
-|-------------|-----|
-| Production | `https://api.qyl.dev` |
-| Staging | `https://api.staging.qyl.dev` |
+| Environment | URL                           |
+| ----------- | ----------------------------- |
+| Production  | `https://api.qyl.dev`         |
+| Staging     | `https://api.staging.qyl.dev` |
 
 ## Authentication
 
-None required. All endpoints are public.
+All endpoints are public. No authentication required.
 
 ## Endpoints
 
-| Category | Count | Description |
-|----------|-------|-------------|
-| Health | 3 | Liveness, readiness probes |
-| Traces | 4 | Distributed trace queries |
-| Logs | 5 | Log search, aggregation |
-| Metrics | 3 | Metrics queries |
-| Sessions | 4 | User session tracking |
-| Errors | 5 | Error group management |
-| Exceptions | 2 | Exception statistics |
-| Deployments | 5 | DORA metrics |
-| CI/CD | 2 | Pipeline monitoring |
-| Streaming | 7 | SSE real-time events |
-| Services | 4 | Service registry |
+| Category    | Endpoints | Description                |
+| ----------- | :-------: | -------------------------- |
+| Health      |     3     | Liveness, readiness probes |
+| Traces      |     4     | Distributed trace queries  |
+| Logs        |     5     | Log search, aggregation    |
+| Metrics     |     3     | Metrics queries            |
+| Sessions    |     4     | User session tracking      |
+| Errors      |     5     | Error group management     |
+| Exceptions  |     2     | Exception statistics       |
+| Deployments |     5     | DORA metrics               |
+| CI/CD       |     2     | Pipeline monitoring        |
+| Streaming   |     7     | SSE real-time events       |
+| Services    |     4     | Service registry           |
 
 ## Pagination
 
-Cursor-based pagination:
+Cursor-based pagination on list endpoints:
 
 ```json
 {
@@ -45,19 +47,19 @@ Cursor-based pagination:
 }
 ```
 
-| Parameter | Type | Default |
-|-----------|------|---------|
-| `limit` | int | 100 (max: 1000) |
-| `cursor` | string | - |
+| Parameter | Type   | Default         |
+| --------- | ------ | --------------- |
+| `limit`   | int    | 100 (max: 1000) |
+| `cursor`  | string | —               |
 
 ## Response Headers
 
-| Header | Purpose |
-|--------|---------|
-| `X-Trace-Id` | Distributed tracing |
-| `X-Request-Id` | Support reference |
+| Header         | Purpose             |
+| -------------- | ------------------- |
+| `X-Trace-Id`   | Distributed tracing |
+| `X-Request-Id` | Support reference   |
 
-## Error Format
+## Errors
 
 ```json
 {
@@ -67,9 +69,9 @@ Cursor-based pagination:
 }
 ```
 
-| Code | Meaning |
-|------|---------|
-| 200 | Success |
-| 400 | Validation error |
-| 404 | Not found |
-| 500 | Server error |
+| Status | Meaning          |
+| ------ | ---------------- |
+| 200    | Success          |
+| 400    | Validation error |
+| 404    | Not found        |
+| 500    | Server error     |

@@ -1,7 +1,7 @@
 ---
-title: "ANcpLua.NET.Sdk"
-sidebarTitle: "Overview"
-description: "MSBuild SDK with Roslyn analyzers, polyfills, and sensible defaults for .NET 10."
+title: 'ANcpLua.NET.Sdk'
+sidebarTitle: 'Overview'
+description: 'MSBuild SDK with Roslyn analyzers, polyfills, and sensible defaults for .NET 10.'
 ---
 
 ## Install
@@ -24,15 +24,16 @@ description: "MSBuild SDK with Roslyn analyzers, polyfills, and sensible default
 
 ## SDK Variants
 
-| SDK | Use Case | Docs |
-|-----|----------|------|
-| `ANcpLua.NET.Sdk` | Libraries, Console, Workers | [Overview](/sdk/overview) |
-| `ANcpLua.NET.Sdk.Web` | ASP.NET Core APIs | [Web variant](/sdk/variants#web) |
+| SDK                    | Use Case                                                                                                                              | Docs                               |
+| ---------------------- | ------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------- |
+| `ANcpLua.NET.Sdk`      | Libraries, Console, Workers                                                                                                           | [Overview](/sdk/overview)          |
+| `ANcpLua.NET.Sdk.Web`  | ASP.NET Core APIs                                                                                                                     | [Web variant](/sdk/variants#web)   |
 | `ANcpLua.NET.Sdk.Test` | xUnit v3 with [Microsoft Testing Platform](https://learn.microsoft.com/en-us/dotnet/core/testing/microsoft-testing-platform-overview) | [Test variant](/sdk/variants#test) |
 
 ## Included
 
 **All variants:**
+
 - [Roslyn analyzers](/analyzers/overview) for code quality
 - [Banned APIs](/sdk/banned-apis) enforcement (legacy → modern)
 - `Throw.IfNull()` guard clauses
@@ -40,18 +41,21 @@ description: "MSBuild SDK with Roslyn analyzers, polyfills, and sensible default
 - [Polyfills](/sdk/polyfills) for netstandard2.0 targets
 
 **Web variant adds:**
+
 - OpenTelemetry integration (logging, metrics, tracing)
 - Health endpoints (`/health`, `/alive`)
 - HTTP resilience via Polly
 
 **Test variant adds:**
+
 - xUnit v3 with Microsoft Testing Platform
 - Code coverage collection
 
 ## Requirements
 
 <Warning>
-**Central Package Management required.** Create this file if you don't have it:
+  **Central Package Management required.** Create this file if you don't have
+  it:
 </Warning>
 
 ```xml title="Directory.Packages.props"

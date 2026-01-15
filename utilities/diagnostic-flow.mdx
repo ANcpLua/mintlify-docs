@@ -1,9 +1,8 @@
 ---
 title: DiagnosticFlow
 description: Railway-oriented programming for source generator pipelines
-icon: "code"
+icon: 'code'
 ---
-
 
 Railway-oriented programming for source generator pipelines. Never lose a diagnostic.
 
@@ -130,10 +129,10 @@ context.RegisterSourceOutput(pipeline, (ctx, code) =>
 
 ## Properties
 
-| Property | Description |
-|----------|-------------|
-| `IsSuccess` | True if no errors |
-| `IsFailed` | True if has errors |
-| `HasErrors` | True if any error-severity diagnostic |
-| `Value` | The wrapped value (throws if failed) |
-| `Diagnostics` | All accumulated diagnostics |
+| Property      | Description                           |
+| ------------- | ------------------------------------- |
+| `IsSuccess`   | True if no errors                     |
+| `IsFailed`    | True if has errors                    |
+| `HasErrors`   | True if any error-severity diagnostic |
+| `Value`       | The wrapped value (throws if failed)  |
+| `Diagnostics` | All accumulated diagnostics           |

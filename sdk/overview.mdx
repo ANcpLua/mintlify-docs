@@ -1,7 +1,7 @@
 ---
-title: "SDK Overview"
-description: "ANcpLua.NET.Sdk features and configuration options."
-icon: "cube"
+title: 'SDK Overview'
+description: 'ANcpLua.NET.Sdk features and configuration options.'
+icon: 'cube'
 ---
 
 The SDK configures sensible defaults and includes tooling for .NET 10 projects.
@@ -10,11 +10,11 @@ The SDK configures sensible defaults and includes tooling for .NET 10 projects.
 
 Choose the SDK variant that matches your project type:
 
-| SDK | Project Type |
-|-----|--------------|
-| `ANcpLua.NET.Sdk` | Class libraries, Console apps, Workers |
-| `ANcpLua.NET.Sdk.Web` | ASP.NET Core APIs |
-| `ANcpLua.NET.Sdk.Test` | xUnit v3 test projects |
+| SDK                    | Project Type                           |
+| ---------------------- | -------------------------------------- |
+| `ANcpLua.NET.Sdk`      | Class libraries, Console apps, Workers |
+| `ANcpLua.NET.Sdk.Web`  | ASP.NET Core APIs                      |
+| `ANcpLua.NET.Sdk.Test` | xUnit v3 test projects                 |
 
 See [Variants](/sdk/variants) for detailed configuration per variant.
 
@@ -22,31 +22,31 @@ See [Variants](/sdk/variants) for detailed configuration per variant.
 
 All variants include:
 
-| Feature | Description |
-|---------|-------------|
-| [Banned APIs](/sdk/banned-apis) | Prevents legacy API usage |
-| [Analyzers](/analyzers/overview) | Code quality rules |
-| Guard clauses | `Throw.IfNull()` and similar |
-| [Polyfills](/sdk/polyfills) | Modern syntax for netstandard2.0 |
-| Nullable | Enabled by default |
-| LangVersion | `latest` |
+| Feature                          | Description                      |
+| -------------------------------- | -------------------------------- |
+| [Banned APIs](/sdk/banned-apis)  | Prevents legacy API usage        |
+| [Analyzers](/analyzers/overview) | Code quality rules               |
+| Guard clauses                    | `Throw.IfNull()` and similar     |
+| [Polyfills](/sdk/polyfills)      | Modern syntax for netstandard2.0 |
+| Nullable                         | Enabled by default               |
+| LangVersion                      | `latest`                         |
 
 ## Web Variant Additions
 
-| Feature | Description |
-|---------|-------------|
-| OpenTelemetry | Logging, metrics, tracing |
-| Health endpoints | `/health`, `/alive` |
-| HTTP resilience | Polly integration |
-| DevLogs | Browser → server logging |
+| Feature          | Description               |
+| ---------------- | ------------------------- |
+| OpenTelemetry    | Logging, metrics, tracing |
+| Health endpoints | `/health`, `/alive`       |
+| HTTP resilience  | Polly integration         |
+| DevLogs          | Browser → server logging  |
 
 ## Test Variant Additions
 
-| Feature | Description |
-|---------|-------------|
-| xUnit v3 | With [Microsoft Testing Platform](https://learn.microsoft.com/en-us/dotnet/core/testing/microsoft-testing-platform-overview) |
-| Coverage | Built-in collection |
-| FakeLogger | Opt-in test logger |
+| Feature    | Description                                                                                                                  |
+| ---------- | ---------------------------------------------------------------------------------------------------------------------------- |
+| xUnit v3   | With [Microsoft Testing Platform](https://learn.microsoft.com/en-us/dotnet/core/testing/microsoft-testing-platform-overview) |
+| Coverage   | Built-in collection                                                                                                          |
+| FakeLogger | Opt-in test logger                                                                                                           |
 
 ## Opt-in Properties
 

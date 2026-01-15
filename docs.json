@@ -29,10 +29,7 @@
     "playground": {
       "mode": "show"
     },
-    "baseUrl": [
-      "https://api.qyl.dev",
-      "https://api.staging.qyl.dev"
-    ]
+    "baseUrl": ["https://api.qyl.dev", "https://api.staging.qyl.dev"]
   },
   "navigation": {
     "tabs": [
@@ -41,10 +38,7 @@
         "groups": [
           {
             "group": "Getting Started",
-            "pages": [
-              "index",
-              "quickstart"
-            ]
+            "pages": ["index", "quickstart"]
           },
           {
             "group": "ANcpLua.NET.Sdk",
@@ -122,9 +116,7 @@
         "groups": [
           {
             "group": "qyl API",
-            "pages": [
-              "api-reference/introduction"
-            ]
+            "pages": ["api-reference/introduction"]
           }
         ],
         "openapi": "/api-reference/openapi.yaml"
@@ -221,4 +213,3 @@
     }
   ]
 }
-

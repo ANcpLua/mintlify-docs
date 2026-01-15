@@ -1,59 +1,64 @@
 ---
-title: "Quickstart"
-description: "Install ANcpLua.NET.Sdk in your .NET 10 project."
+title: 'Quickstart'
+description: 'Install ANcpLua.NET.Sdk in your .NET 10 project.'
 ---
 
 ## Prerequisites
 
-<Check>[.NET 10 SDK](https://dotnet.microsoft.com/download/dotnet/10.0) installed</Check>
+<Check>
+  [.NET 10 SDK](https://dotnet.microsoft.com/download/dotnet/10.0) installed
+</Check>
 <Check>[Central Package Management](/index#requirements) enabled</Check>
 
 ## Installation
 
 <Steps>
-  <Step title="Add SDK reference">
-    Add to your `global.json` (create if it doesn't exist):
+    <Step title="Add SDK reference">
+        Add to your `global.json` (create if it doesn't exist):
 
-    ```json title="global.json"
-    {
-      "msbuild-sdks": {
-        "ANcpLua.NET.Sdk": "*"
-      }
-    }
-    ```
-  </Step>
-  <Step title="Update project file">
-    Set the `Sdk` attribute to the variant you need:
+        ```json title="global.json"
+        {
+            "msbuild-sdks": {
+            "ANcpLua.NET.Sdk": "*"
+        }
+        }
+        ```
 
-    ```xml title="Library or Console"
-    <Project Sdk="ANcpLua.NET.Sdk">
-      <PropertyGroup>
-        <TargetFramework>net10.0</TargetFramework>
-      </PropertyGroup>
-    </Project>
-    ```
+    </Step>
+    <Step title="Update project file">
+        Set the `Sdk` attribute to the variant you need:
 
-    ```xml title="ASP.NET Core API"
-    <Project Sdk="ANcpLua.NET.Sdk.Web">
-      <PropertyGroup>
-        <TargetFramework>net10.0</TargetFramework>
-      </PropertyGroup>
-    </Project>
-    ```
+        ```xml title="Library or Console"
+        <Project Sdk="ANcpLua.NET.Sdk">
+            <PropertyGroup>
+                <TargetFramework>net10.0</TargetFramework>
+            </PropertyGroup>
+        </Project>
+        ```
 
-    ```xml title="xUnit v3 Tests"
-    <Project Sdk="ANcpLua.NET.Sdk.Test">
-      <PropertyGroup>
-        <TargetFramework>net10.0</TargetFramework>
-      </PropertyGroup>
-    </Project>
-    ```
-  </Step>
-  <Step title="Build">
-    ```bash
-    dotnet build
-    ```
-  </Step>
+        ```xml title="ASP.NET Core API"
+        <Project Sdk="ANcpLua.NET.Sdk.Web">
+            <PropertyGroup>
+                <TargetFramework>net10.0</TargetFramework>
+            </PropertyGroup>
+        </Project>
+        ```
+
+        ```xml title="xUnit v3 Tests"
+        <Project Sdk="ANcpLua.NET.Sdk.Test">
+            <PropertyGroup>
+                <TargetFramework>net10.0</TargetFramework>
+            </PropertyGroup>
+        </Project>
+        ```
+
+    </Step>
+    <Step title="Build">
+        ```bash
+        dotnet build
+        ```
+    </Step>
+
 </Steps>
 
 ## What's configured

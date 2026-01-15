@@ -1,0 +1,3 @@
+# Ignore instruction files from link checking
+CLAUDE.md
+README.md

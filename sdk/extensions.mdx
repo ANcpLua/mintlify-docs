@@ -1,18 +1,18 @@
 ---
-title: "Extensions"
-description: "Opt-in extensions injected via MSBuild properties."
-icon: "puzzle-piece"
+title: 'Extensions'
+description: 'Opt-in extensions injected via MSBuild properties.'
+icon: 'puzzle-piece'
 ---
 
 Extensions are code files injected into your project at build time. Enable them via MSBuild properties.
 
 ## Available Extensions
 
-| Property | What it does |
-|----------|--------------|
-| `InjectSourceGenHelpers` | Roslyn utilities for source generators |
-| `InjectFakeLogger` | Test helpers for `FakeLogCollector` |
-| `InjectStringOrdinalComparer` | Singleton string comparers |
+| Property                      | What it does                           |
+| ----------------------------- | -------------------------------------- |
+| `InjectSourceGenHelpers`      | Roslyn utilities for source generators |
+| `InjectFakeLogger`            | Test helpers for `FakeLogCollector`    |
+| `InjectStringOrdinalComparer` | Singleton string comparers             |
 
 ## Source Generator Helpers
 
@@ -25,7 +25,8 @@ For source generator projects. Injects utilities from [ANcpLua.Roslyn.Utilities]
 ```
 
 <Note>
-Source generators can't reference NuGet packages at design-time. This property embeds the utilities as internal source files instead.
+  Source generators can't reference NuGet packages at design-time. This property
+  embeds the utilities as internal source files instead.
 </Note>
 
 ## FakeLogger Extensions
@@ -39,6 +40,7 @@ For test projects. Adds helpers for `FakeLogCollector` from `Microsoft.Extension
 ```
 
 Methods injected:
+
 - `GetFullLoggerText()` - Dump all logs as string
 - `WaitForLogAsync()` - Async polling for log entries
 - `WaitForLogCountAsync()` - Wait for N matching entries
@@ -54,5 +56,6 @@ Singleton ordinal comparers for allocation-free comparisons.
 ```
 
 Classes injected:
+
 - `StringOrdinalComparer.Instance`
 - `StringOrdinalIgnoreCaseComparer.Instance`

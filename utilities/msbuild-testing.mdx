@@ -1,9 +1,8 @@
 ---
 title: MSBuild Testing
 description: Integration testing infrastructure for testing with real dotnet build commands
-icon: "code"
+icon: 'code'
 ---
-
 
 Integration testing infrastructure for testing with real `dotnet build` commands.
 
@@ -76,20 +75,21 @@ project.WithDotnetSdkVersion(NetSdkVersion.Net100);
 ```
 
 Available SDK versions via `NetSdkVersion`:
+
 - `Net100` - .NET 10.0 (default)
 - `Net90` - .NET 9.0
 - `Net80` - .NET 8.0
 
 #### Build Operations
 
-| Method | Purpose |
-|--------|---------|
-| `BuildAsync()` | Compiles the project |
-| `RunAsync()` | Builds and executes (for console apps) |
-| `TestAsync()` | Builds and runs tests |
-| `PackAsync()` | Creates NuGet package |
-| `RestoreAsync()` | Restores packages only |
-| `ExecuteDotnetCommandAsync()` | Run any dotnet command |
+| Method                        | Purpose                                |
+| ----------------------------- | -------------------------------------- |
+| `BuildAsync()`                | Compiles the project                   |
+| `RunAsync()`                  | Builds and executes (for console apps) |
+| `TestAsync()`                 | Builds and runs tests                  |
+| `PackAsync()`                 | Creates NuGet package                  |
+| `RestoreAsync()`              | Restores packages only                 |
+| `ExecuteDotnetCommandAsync()` | Run any dotnet command                 |
 
 Each method returns a `BuildResult` with SARIF diagnostics and binary log.
 
@@ -129,13 +129,13 @@ project
     .WithProperty(Nullable, Enable);
 ```
 
-| Class | Purpose |
-|-------|---------|
-| `Tfm` | Target framework monikers (`Net100`, `NetStandard20`) |
-| `Prop` | Property names (`TargetFramework`, `OutputType`) |
-| `Val` | Property values (`Library`, `Exe`, `Enable`) |
-| `Item` | Item names (`PackageReference`, `Compile`) |
-| `Attr` | Attribute names (`Include`, `Version`) |
+| Class  | Purpose                                               |
+| ------ | ----------------------------------------------------- |
+| `Tfm`  | Target framework monikers (`Net100`, `NetStandard20`) |
+| `Prop` | Property names (`TargetFramework`, `OutputType`)      |
+| `Val`  | Property values (`Library`, `Exe`, `Enable`)          |
+| `Item` | Item names (`PackageReference`, `Compile`)            |
+| `Attr` | Attribute names (`Include`, `Version`)                |
 
 ### DotNetSdkHelpers
 
@@ -147,6 +147,7 @@ var dotnetPath = await DotNetSdkHelpers.Get(NetSdkVersion.Net100);
 ```
 
 The SDK cache location:
+
 - macOS/Linux: `~/.dotnet-sdk-cache/`
 - Windows: `%USERPROFILE%\.dotnet-sdk-cache\`
 
@@ -545,6 +546,7 @@ File.WriteAllBytes("debug.binlog", binlog);
 ### Environment Isolation
 
 `ProjectBuilder` automatically removes interfering environment variables:
+
 - `CI`
 - `GITHUB_*`
 - `MSBuild*`

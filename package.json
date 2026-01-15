@@ -1,0 +1,27 @@
+{
+  "name": "mintlify-docs",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "mint dev",
+    "format": "prettier --write \"**/*.{mdx,md,json,yaml,yml}\"",
+    "format:check": "prettier --check \"**/*.{mdx,md,json,yaml,yml}\"",
+    "lint": "npm run lint:links && npm run lint:a11y && npm run lint:openapi",
+    "lint:links": "mint broken-links",
+    "lint:a11y": "mint a11y",
+    "lint:openapi": "mint openapi-check api-reference/openapi.yaml",
+    "prepare": "husky"
+  },
+  "devDependencies": {
+    "husky": "^9.1.7",
+    "lint-staged": "^15.3.0",
+    "mint": "^4.2.278",
+    "prettier": "^3.4.2"
+  },
+  "lint-staged": {
+    "*.{mdx,md,json,yaml,yml}": [
+      "prettier --write"
+    ]
+  }
+}

@@ -1,9 +1,8 @@
 ---
 title: Pattern Matching
 description: Composable patterns for matching Roslyn symbols
-icon: "code"
+icon: 'code'
 ---
-
 
 Composable patterns for matching Roslyn symbols. Replace verbose if-statements with declarative patterns.
 
@@ -92,7 +91,7 @@ SymbolPattern.Type()
     .Build();
 ```
 
-## Match.* DSL
+## Match.\* DSL
 
 Fluent matching without building:
 
@@ -123,7 +122,7 @@ Match.Property().ReadOnly().Required().Matches(prop);
 Match.Field().Const().Public().Matches(field);
 ```
 
-## Invoke.* (Operation Matching)
+## Invoke.\* (Operation Matching)
 
 Match method invocations:
 

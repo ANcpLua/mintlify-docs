@@ -1,22 +1,32 @@
 ---
-title: Polyfills
-description: Automatic polyfills for older target frameworks
-icon: "cube"
+title: 'Polyfills'
+description: 'Modern C# features for netstandard2.0 targets.'
+icon: 'puzzle-piece'
 ---
 
+When targeting `netstandard2.0`, the SDK injects polyfills for modern C# features.
 
-The SDK automatically injects polyfills for older target frameworks.
+| Feature                | What it enables                      |
+| ---------------------- | ------------------------------------ |
+| `Index` / `Range`      | `array[^1]`, `array[1..3]` syntax    |
+| `IsExternalInit`       | `record` types and `init` properties |
+| Nullability attributes | `[NotNull]`, `[MaybeNull]`, etc.     |
+| `TimeProvider`         | Testable time abstraction            |
+| Trim/AOT attributes    | `[RequiresUnreferencedCode]`, etc.   |
+| String extensions      | `string.Contains(char)` overloads    |
 
-| Feature | Min TFM | Description |
-|---------|---------|-------------|
-| DiagnosticAttributes | netstandard2.0 | This directory provides polyfills for various diagnostic attributes, allowing their use in projects targeting older .NET frameworks where these attributes might not be natively supported. |
-| Diagnostics | netstandard2.0 | This directory contains diagnostic polyfills and helpers for older .NET target frameworks. |
-| Exceptions | netstandard2.0 | This directory provides polyfills for exception types introduced in newer .NET versions. |
-| Experimental | netstandard2.0 | This directory contains polyfills for experimental features or attributes. |
-| IndexRange | netstandard2.0 | This directory contains polyfills for the `System.Index` and `System.Range` types, enabling their use in projects targeting older .NET frameworks that do not natively support them. |
-| IsExternalInit | netstandard2.0 | Enables use of C# record types on older frameworks. |
-| LanguageFeatures | netstandard2.0 | This directory provides polyfills for various C# language features, allowing their use in projects targeting older .NET frameworks where these features might not be natively supported. |
-| NullabilityAttributes | netstandard2.0 | This directory contains polyfills for various C# nullability-related attributes. |
-| StringExtensions | netstandard2.0 | No description |
-| TimeProvider | netstandard2.0 | This directory contains a polyfill for the `System.TimeProvider` class, enabling consistent time abstraction in projects targeting older .NET frameworks that do not natively support this API. |
-| TrimAttributes | netstandard2.0 | This directory contains polyfills for various .NET trimming and AOT (Ahead-of-Time) compilation related attributes ( e.g., `RequiresUnreferencedCodeAttribute`, `DynamicallyAccessedMembersAttribute`... |
+## Opt-in Polyfills
+
+Additional polyfills available on request:
+
+```xml
+<PropertyGroup>
+  <InjectLockPolyfill>true</InjectLockPolyfill>
+  <InjectTimeProviderPolyfill>true</InjectTimeProviderPolyfill>
+</PropertyGroup>
+```
+
+<Note>
+  Polyfills are only injected for `netstandard2.0` / `netstandard2.1` targets.
+  .NET 10 projects don't need them.
+</Note>
