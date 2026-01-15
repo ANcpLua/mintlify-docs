@@ -11,6 +11,18 @@ Source: [AL0010PartialTypeAnalyzer.cs](https://github.com/ANcpLua/ANcpLua.Analyz
 
 Types that are targets for source generators should be marked as partial.
 
+## Bad Code
+
+```csharp
+public class MyGenerator { }
+```
+
+## Good Code
+
+```csharp
+public partial class MyGenerator { }
+```
+
 ## Properties
 
 - **Category**: Design

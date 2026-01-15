@@ -11,6 +11,18 @@ Source: [AL0004ToAL0005SpanComparisonAnalyzer.cs](https://github.com/ANcpLua/ANc
 
 When comparing Span and a constant, use pattern matching instead of equality operators, unless you want to compare addresses.
 
+## Bad Code
+
+```csharp
+if (span == "hello")
+```
+
+## Good Code
+
+```csharp
+if (span is "hello")
+```
+
 ## Properties
 
 - **Category**: Usage

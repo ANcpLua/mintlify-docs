@@ -11,6 +11,18 @@ Source: [AL0012DeprecatedAttributeAnalyzer.cs](https://github.com/ANcpLua/ANcpLu
 
 This attribute name has been deprecated in the OpenTelemetry semantic conventions.
 
+## Bad Code
+
+```csharp
+activity.SetTag("http.method", "GET");
+```
+
+## Good Code
+
+```csharp
+activity.SetTag("http.request.method", "GET");
+```
+
 ## Properties
 
 - **Category**: OpenTelemetry

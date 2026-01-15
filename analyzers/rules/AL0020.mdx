@@ -11,6 +11,18 @@ Source: [AL0020ToAL0024FormBindingAnalyzer.cs](https://github.com/ANcpLua/ANcpLu
 
 IFormCollection parameters must have an explicit [FromForm] attribute. Unlike IFormFile which auto-binds, IFormCollection requires explicit attribution for clarity and safety.
 
+## Bad Code
+
+```csharp
+app.MapPost("/", (IFormCollection form) => ...);
+```
+
+## Good Code
+
+```csharp
+app.MapPost("/", ([FromForm] IFormCollection form) => ...);
+```
+
 ## Properties
 
 - **Category**: ASP.NET Core

@@ -11,6 +11,20 @@ Source: [AL0011LockKeywordAnalyzer.cs](https://github.com/ANcpLua/ANcpLua.Analyz
 
 The lock keyword on object/non-Lock types should be replaced with the Lock class from System.Threading.
 
+## Bad Code
+
+```csharp
+private object _syncRoot = new();
+lock (_syncRoot) { }
+```
+
+## Good Code
+
+```csharp
+private Lock _syncRoot = new();
+lock (_syncRoot) { }
+```
+
 ## Properties
 
 - **Category**: Threading

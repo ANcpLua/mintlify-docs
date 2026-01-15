@@ -11,6 +11,18 @@ Source: [Ar0002MakeStaticLambdaRefactoring.cs](https://github.com/ANcpLua/ANcpLu
 
 This is a code refactoring that make static lambda.
 
+## Before
+
+```csharp
+list.Where(x => x > 0);
+```
+
+## After
+
+```csharp
+list.Where(static x => x > 0);
+```
+
 ## Properties
 
 - **Type**: Refactoring (not a diagnostic)

@@ -11,6 +11,18 @@ Source: [AL0020ToAL0024FormBindingAnalyzer.cs](https://github.com/ANcpLua/ANcpLu
 
 Mixing IFormCollection with a [FromForm] DTO is not supported. Choose one approach: use IFormCollection for dynamic form access or a typed DTO for structured binding.
 
+## Bad Code
+
+```csharp
+([FromForm] UserDto user, [FromForm] IFormCollection form)
+```
+
+## Good Code
+
+```csharp
+([FromForm] UserDto user) // choose one approach
+```
+
 ## Properties
 
 - **Category**: ASP.NET Core

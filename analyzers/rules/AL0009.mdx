@@ -11,6 +11,16 @@ Source: [AL0007ToAL0009IXmlSerializableAnalyzer.cs](https://github.com/ANcpLua/A
 
 Calling GetSchema is not supported; it should always return null and isn't intended to be invoked.
 
+## Bad Code
+
+```csharp
+var schema = serializable.GetSchema();
+```
+
+## Good Code
+
+Remove the call - GetSchema should never be called.
+
 ## Properties
 
 - **Category**: Usage

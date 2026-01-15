@@ -11,6 +11,18 @@ Source: [AL0003DontDivideByConstantZeroAnalyzer.cs](https://github.com/ANcpLua/A
 
 Integers and Decimal should never be divided by the constant 0 as this causes a DivideByZeroException at runtime.
 
+## Bad Code
+
+```csharp
+int result = value / 0;
+```
+
+## Good Code
+
+```csharp
+int result = divisor != 0 ? value / divisor : 0;
+```
+
 ## Properties
 
 - **Category**: Reliability

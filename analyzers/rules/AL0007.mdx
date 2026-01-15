@@ -11,6 +11,18 @@ Source: [AL0007ToAL0009IXmlSerializableAnalyzer.cs](https://github.com/ANcpLua/A
 
 Implement IXmlSerializable.GetSchema explicitly to avoid exposing it as part of the public API.
 
+## Bad Code
+
+```csharp
+public XmlSchema? GetSchema() => null;
+```
+
+## Good Code
+
+```csharp
+XmlSchema? IXmlSerializable.GetSchema() => null;
+```
+
 ## Properties
 
 - **Category**: Usage

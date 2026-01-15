@@ -11,6 +11,18 @@ Source: [AL0020ToAL0024FormBindingAnalyzer.cs](https://github.com/ANcpLua/ANcpLu
 
 An endpoint can only have one structured form source. Multiple [FromForm] DTOs or IFormCollections create ambiguity about which parameter receives the form data.
 
+## Bad Code
+
+```csharp
+([FromForm] UserDto user, [FromForm] AddressDto address)
+```
+
+## Good Code
+
+```csharp
+([FromForm] CombinedDto data) // combine into single DTO
+```
+
 ## Properties
 
 - **Category**: ASP.NET Core

@@ -11,6 +11,18 @@ Source: [AL0004ToAL0005SpanComparisonAnalyzer.cs](https://github.com/ANcpLua/ANc
 
 When comparing Span and a non-constant, use SequenceEqual instead of equality operators, unless you want to compare addresses.
 
+## Bad Code
+
+```csharp
+if (span1 == span2)
+```
+
+## Good Code
+
+```csharp
+if (span1.SequenceEqual(span2))
+```
+
 ## Properties
 
 - **Category**: Usage

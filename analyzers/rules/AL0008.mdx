@@ -11,6 +11,18 @@ Source: [AL0007ToAL0009IXmlSerializableAnalyzer.cs](https://github.com/ANcpLua/A
 
 GetSchema should return null according to IXmlSerializable guidance and should not be abstract.
 
+## Bad Code
+
+```csharp
+XmlSchema? IXmlSerializable.GetSchema() => new XmlSchema();
+```
+
+## Good Code
+
+```csharp
+XmlSchema? IXmlSerializable.GetSchema() => null;
+```
+
 ## Properties
 
 - **Category**: Usage

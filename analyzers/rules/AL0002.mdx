@@ -11,6 +11,18 @@ Source: [AL0002DontRepeatNegatedPatternAnalyzer.cs](https://github.com/ANcpLua/A
 
 The negated pattern should not be repeated multiple times.
 
+## Bad Code
+
+```csharp
+if (x is not null and not 0 and not 1)
+```
+
+## Good Code
+
+```csharp
+if (x is not (null or 0 or 1))
+```
+
 ## Properties
 
 - **Category**: Design

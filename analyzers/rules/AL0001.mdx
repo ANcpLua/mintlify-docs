@@ -11,6 +11,24 @@ Source: [AL0001ProhibitPrimaryConstructorParameterReassignmentAnalyzer.cs](https
 
 Primary constructor parameters should not be reassigned as this can lead to confusion and bugs.
 
+## Bad Code
+
+```csharp
+public class Service(ILogger logger)
+{
+    public void Reset() => logger = null;
+}
+```
+
+## Good Code
+
+```csharp
+public class Service(ILogger logger)
+{
+    private readonly ILogger _logger = logger;
+}
+```
+
 ## Properties
 
 - **Category**: Design

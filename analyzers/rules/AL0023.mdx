@@ -11,6 +11,18 @@ Source: [AL0020ToAL0024FormBindingAnalyzer.cs](https://github.com/ANcpLua/ANcpLu
 
 [FromForm] can only bind primitives, primitive collections, or DTOs with a parameterless constructor or primary constructor with all-primitive parameters.
 
+## Bad Code
+
+```csharp
+([FromForm] ComplexService service) // has non-primitive constructor
+```
+
+## Good Code
+
+```csharp
+([FromForm] UserDto user) // parameterless or primitive constructor
+```
+
 ## Properties
 
 - **Category**: ASP.NET Core

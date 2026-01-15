@@ -11,6 +11,18 @@ Source: [AL0013MissingSchemaUrlAnalyzer.cs](https://github.com/ANcpLua/ANcpLua.A
 
 Setting the schema URL allows collectors and backends to understand which version of semantic conventions your telemetry uses.
 
+## Bad Code
+
+```csharp
+using var activity = source.StartActivity("operation");
+```
+
+## Good Code
+
+```csharp
+source.SetSchemaUrl("https://opentelemetry.io/schemas/1.21.0");
+```
+
 ## Properties
 
 - **Category**: OpenTelemetry

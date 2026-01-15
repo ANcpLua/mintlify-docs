@@ -11,6 +11,18 @@ Source: [AL0025PreferStaticLambdaAnalyzer.cs](https://github.com/ANcpLua/ANcpLua
 
 Lambda expressions and anonymous methods that don't capture variables should be marked 'static' to avoid unnecessary allocations and improve performance.
 
+## Bad Code
+
+```csharp
+list.Where(x => x > 0) // when no captures
+```
+
+## Good Code
+
+```csharp
+list.Where(static x => x > 0)
+```
+
 ## Properties
 
 - **Category**: Usage

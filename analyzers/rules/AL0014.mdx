@@ -11,6 +11,20 @@ Source: [AL0014PreferPatternMatchingAnalyzer.cs](https://github.com/ANcpLua/ANcp
 
 Pattern matching syntax (is/is not) is more expressive and idiomatic. For null checks, it also bypasses overloaded equality operators.
 
+## Bad Code
+
+```csharp
+if (x == null)
+if (x != 0)
+```
+
+## Good Code
+
+```csharp
+if (x is null)
+if (x is not 0)
+```
+
 ## Properties
 
 - **Category**: Style

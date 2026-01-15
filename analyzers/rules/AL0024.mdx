@@ -11,6 +11,18 @@ Source: [AL0020ToAL0024FormBindingAnalyzer.cs](https://github.com/ANcpLua/ANcpLu
 
 An HTTP request body can only be consumed once. Mixing [FromForm] and [FromBody] parameters in the same endpoint is not supported.
 
+## Bad Code
+
+```csharp
+([FromForm] UserDto user, [FromBody] string json)
+```
+
+## Good Code
+
+```csharp
+([FromForm] UserDto user) // use one or the other
+```
+
 ## Properties
 
 - **Category**: ASP.NET Core

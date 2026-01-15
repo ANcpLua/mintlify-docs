@@ -11,6 +11,24 @@ Source: [AL0006FieldNameConflictWithPrimaryConstructorAnalyzer.cs](https://githu
 
 Field names should not conflict with primary constructor parameters to avoid shadowing and confusion.
 
+## Bad Code
+
+```csharp
+public class Service(ILogger logger)
+{
+    private ILogger logger;
+}
+```
+
+## Good Code
+
+```csharp
+public class Service(ILogger logger)
+{
+    private ILogger _logger = logger;
+}
+```
+
 ## Properties
 
 - **Category**: Design

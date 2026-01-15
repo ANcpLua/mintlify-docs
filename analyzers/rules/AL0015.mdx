@@ -11,6 +11,18 @@ Source: [AL0015NormalizeNullGuardStyleAnalyzer.cs](https://github.com/ANcpLua/AN
 
 Null-guards should be normalized to the preferred project style (Throw, BCL, or Portable).
 
+## Bad Code
+
+```csharp
+ArgumentNullException.ThrowIfNull(param);
+```
+
+## Good Code
+
+```csharp
+Throw.IfNull(param);
+```
+
 ## Properties
 
 - **Category**: Style

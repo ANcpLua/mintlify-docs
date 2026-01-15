@@ -3,9 +3,9 @@
   "theme": "mint",
   "name": "ANcpLua Framework",
   "colors": {
-    "primary": "#0891B2",
-    "light": "#06B6D4",
-    "dark": "#0E7490"
+    "primary": "#0E7490",
+    "light": "#0891B2",
+    "dark": "#0A6A80"
   },
   "favicon": "/favicon.svg",
   "logo": {
