@@ -1,0 +1,43 @@
+---
+title: 'AL0026 - Avoid DateTime time accessors'
+sidebarTitle: 'AL0026'
+description: DateTime.Now and DateTime.UtcNow make code difficult to test. Use TimeProvider instead.
+icon: 'shield-check'
+---
+
+Source: [AL0026AvoidDateTimeNowAnalyzer.cs](https://github.com/ANcpLua/ANcpLua.Analyzers/blob/main/src/ANcpLua.Analyzers/Analyzers/AL0026AvoidDateTimeNowAnalyzer.cs)
+
+## Description
+
+DateTime.Now and DateTime.UtcNow make code difficult to test. Use TimeProvider.System.GetLocalNow() or GetUtcNow() instead, which can be mocked in tests.
+
+## Bad Code
+
+```csharp
+var now = DateTime.Now;
+var utcNow = DateTime.UtcNow;
+```
+
+## Good Code
+
+```csharp
+var now = TimeProvider.System.GetLocalNow();
+var utcNow = TimeProvider.System.GetUtcNow();
+```
+
+## Properties
+
+- **Category**: Usage
+- **Severity**: Warning
+- **Enabled by default**: True
+- **Code fix available**: False
+
+## Configuration
+
+```editorconfig
+dotnet_diagnostic.AL0026.severity = warning
+```
+
+## Notes
+
+TimeProvider was introduced in .NET 8 and provides a testable abstraction for time-related operations. You can inject a custom TimeProvider in tests to control time behavior.

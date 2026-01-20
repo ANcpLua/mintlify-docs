@@ -1,0 +1,56 @@
+---
+title: 'AL0027 - Avoid legacy JSON library'
+sidebarTitle: 'AL0027'
+description: Replace legacy JSON libraries with System.Text.Json for better performance and native .NET support
+icon: 'shield-check'
+---
+
+Source: [AL0027AvoidNewtonsoftJsonAnalyzer.cs](https://github.com/ANcpLua/ANcpLua.Analyzers/blob/main/src/ANcpLua.Analyzers/Analyzers/AL0027AvoidNewtonsoftJsonAnalyzer.cs)
+
+## Description
+
+The legacy JSON library (Newtonsoft.Json) should be replaced with System.Text.Json for better performance and native .NET support.
+
+This rule only triggers when System.Text.Json is available in the project, making migration possible.
+
+## Bad Code
+
+```csharp
+using Newtonsoft.Json;
+
+var json = JsonConvert.SerializeObject(obj);
+var obj = JsonConvert.DeserializeObject<MyClass>(json);
+var jObject = JObject.Parse(json);
+```
+
+## Good Code
+
+```csharp
+using System.Text.Json;
+
+var json = JsonSerializer.Serialize(obj);
+var obj = JsonSerializer.Deserialize<MyClass>(json);
+var doc = JsonDocument.Parse(json);
+```
+
+## Properties
+
+- **Category**: Usage
+- **Severity**: Warning
+- **Enabled by default**: True
+- **Code fix available**: False
+
+## Configuration
+
+```editorconfig
+dotnet_diagnostic.AL0027.severity = warning
+```
+
+## Notes
+
+System.Text.Json is the recommended JSON library for .NET applications. It offers:
+
+- Better performance (faster serialization/deserialization)
+- Lower memory allocations
+- Native integration with ASP.NET Core
+- Source generator support for AOT compilation

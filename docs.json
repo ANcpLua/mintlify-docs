@@ -80,12 +80,15 @@
                   "analyzers/rules/AL0015",
                   "analyzers/rules/AL0016",
                   "analyzers/rules/AL0017",
+                  "analyzers/rules/AL0018",
                   "analyzers/rules/AL0020",
                   "analyzers/rules/AL0021",
                   "analyzers/rules/AL0022",
                   "analyzers/rules/AL0023",
                   "analyzers/rules/AL0024",
                   "analyzers/rules/AL0025",
+                  "analyzers/rules/AL0026",
+                  "analyzers/rules/AL0027",
                   "analyzers/rules/AR0001",
                   "analyzers/rules/AR0002"
                 ]

@@ -4,7 +4,7 @@ description: Complete reference for all ANcpLua.Analyzers diagnostic rules
 icon: 'shield-check'
 ---
 
-ANcpLua.Analyzers provides 24 diagnostic rules and 2 refactorings for C# code quality, organized by category.
+ANcpLua.Analyzers provides 27 diagnostic rules and 2 refactorings for C# code quality, organized by category.
 
 ## Design Rules
 
@@ -31,6 +31,8 @@ ANcpLua.Analyzers provides 24 diagnostic rules and 2 refactorings for C# code qu
 | [AL0008](/analyzers/rules/AL0008) | Warning  | GetSchema must return null and not be abstract     |
 | [AL0009](/analyzers/rules/AL0009) | Warning  | Don't call IXmlSerializable.GetSchema              |
 | [AL0025](/analyzers/rules/AL0025) | Info     | Anonymous function can be made static              |
+| [AL0026](/analyzers/rules/AL0026) | Warning  | Avoid DateTime.Now/UtcNow, use TimeProvider        |
+| [AL0027](/analyzers/rules/AL0027) | Warning  | Avoid Newtonsoft.Json, use System.Text.Json        |
 
 ## Threading Rules
 
@@ -58,6 +60,7 @@ ANcpLua.Analyzers provides 24 diagnostic rules and 2 refactorings for C# code qu
 | Rule                              | Severity | Description                                           |
 | --------------------------------- | -------- | ----------------------------------------------------- |
 | [AL0017](/analyzers/rules/AL0017) | Warning  | Hardcoded package version in Directory.Packages.props |
+| [AL0018](/analyzers/rules/AL0018) | Warning  | Version.props not imported in Directory.Build.props   |
 
 ## ASP.NET Core Rules
 

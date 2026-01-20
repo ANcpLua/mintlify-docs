@@ -1,0 +1,48 @@
+---
+title: 'AL0018 - Version.props not imported'
+sidebarTitle: 'AL0018'
+description: Directory.Build.props should import Version.props for centralized version management
+icon: 'shield-check'
+---
+
+Source: [AL0018VersionPropsNotImportedAnalyzer.cs](https://github.com/ANcpLua/ANcpLua.Analyzers/blob/main/src/ANcpLua.Analyzers/Analyzers/AL0018VersionPropsNotImportedAnalyzer.cs)
+
+## Description
+
+Version.props should be imported in Directory.Build.props to enable centralized package version management using $(VariableName) syntax.
+
+## Bad Code
+
+```xml
+<!-- Directory.Build.props without Version.props import -->
+<Project>
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+  </PropertyGroup>
+</Project>
+```
+
+## Good Code
+
+```xml
+<!-- Directory.Build.props with Version.props import -->
+<Project>
+  <Import Project="Version.props" />
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+  </PropertyGroup>
+</Project>
+```
+
+## Properties
+
+- **Category**: Usage
+- **Severity**: Warning
+- **Enabled by default**: True
+- **Code fix available**: False
+
+## Configuration
+
+```editorconfig
+dotnet_diagnostic.AL0018.severity = warning
+```
