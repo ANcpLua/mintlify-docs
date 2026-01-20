@@ -1,44 +1,241 @@
 ---
 title: Testing Infrastructure
-description: Testing frameworks for analyzers, code fixes, and source generators
-icon: 'code'
+description: Testing frameworks for analyzers, code fixes, refactorings, and source generators
+icon: 'flask-vial'
 ---
 
-`ANcpLua.Roslyn.Utilities.Testing` provides two testing paradigms:
+`ANcpLua.Roslyn.Utilities.Testing` provides fluent base classes for testing Roslyn components:
 
-1. **Roslyn Testing** - In-memory compilation testing for analyzers, code fixes, and generators
-2. **MSBuild Testing** - Integration testing with real `dotnet build` commands
+| Base Class                         | Purpose                         |
+| ---------------------------------- | ------------------------------- |
+| `AnalyzerTest<TAnalyzer>`          | Test diagnostic analyzers       |
+| `CodeFixTest<TAnalyzer, TCodeFix>` | Test code fix providers         |
+| `RefactoringTest<TRefactoring>`    | Test code refactoring providers |
 
 ## Installation
 
 ```xml
-<PackageReference Include="ANcpLua.Roslyn.Utilities.Testing" Version="1.8.0" />
+<PackageReference Include="ANcpLua.Roslyn.Utilities.Testing" Version="1.14.0" />
 ```
 
-## Roslyn Testing
+## AnalyzerTest
 
-For unit testing analyzers, code fixes, and source generators without invoking MSBuild.
+Base class for testing diagnostic analyzers with pre-configured .NET 10 reference assemblies.
+
+### Basic Usage
 
 ```csharp
 using ANcpLua.Roslyn.Utilities.Testing;
 
-[Fact]
-public async Task Analyzer_ReportsWarning()
+public class MyAnalyzerTests : AnalyzerTest<MyAnalyzer>
 {
-    var test = new AnalyzerTest<MyAnalyzer>()
-        .WithSource("""
-            class Sample
-            {
-                void Method() { [|BadApi()|]; }
-            }
-            """);
+    [Fact]
+    public Task ShouldReportWarning() => VerifyAsync("""
+        class C
+        {
+            void M() { {|MY001:BadCode()|}; }
+        }
+        """);
 
-    await test.RunAsync();
+    [Fact]
+    public Task ShouldNotReport() => VerifyAsync("""
+        class C
+        {
+            void M() { GoodCode(); }
+        }
+        """);
 }
 ```
 
-## MSBuild Testing
+<Note>
+Use diagnostic markup `{|DIAGNOSTIC_ID:code|}` to mark expected diagnostic locations.
+</Note>
 
-For integration testing with real builds - testing SDK features, package behavior, or build-time behavior.
+### Testing with Additional Files
 
-See [MSBuild Testing](/utilities/msbuild-testing) for details.
+For analyzers that inspect non-C# files (MSBuild props, JSON configs, etc.):
+
+```csharp
+using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.Testing;
+
+public class PropsAnalyzerTests : AnalyzerTest<MyPropsAnalyzer>
+{
+    [Fact]
+    public Task ShouldWarnWhenMissingImport()
+    {
+        const string directoryBuildProps = """
+            <Project>
+                <PropertyGroup>
+                    <SomeProperty>Value</SomeProperty>
+                </PropertyGroup>
+            </Project>
+            """;
+
+        var expected = new DiagnosticResult("MY001", DiagnosticSeverity.Warning)
+            .WithLocation("Directory.Build.props", 1, 1);
+
+        return VerifyAsync(
+            source: "public class C { }",
+            additionalFiles: [("Directory.Build.props", directoryBuildProps)],
+            expectedDiagnostics: [expected]);
+    }
+
+    [Fact]
+    public Task ShouldNotWarnWhenImportPresent()
+    {
+        const string directoryBuildProps = """
+            <Project>
+                <Import Project="Version.props" />
+            </Project>
+            """;
+
+        // No expected diagnostics = verify clean compilation
+        return VerifyAsync(
+            source: "public class C { }",
+            additionalFiles: [("Directory.Build.props", directoryBuildProps)]);
+    }
+}
+```
+
+### Target Framework Selection
+
+```csharp
+// Default: .NET 10 references
+await VerifyAsync(source);
+
+// For netstandard2.0 analyzers (e.g., source generators)
+await VerifyAsync(source, useNet10References: false);
+```
+
+## CodeFixTest
+
+Base class for testing code fix providers that transform diagnostic-marked code.
+
+```csharp
+using ANcpLua.Roslyn.Utilities.Testing;
+
+public class MyCodeFixTests : CodeFixTest<MyAnalyzer, MyCodeFix>
+{
+    [Fact]
+    public Task ShouldFixWarning() => VerifyAsync(
+        source: """
+            class C
+            {
+                void M() { {|MY001:BadCode()|}; }
+            }
+            """,
+        fixedSource: """
+            class C
+            {
+                void M() { GoodCode(); }
+            }
+            """);
+}
+```
+
+<Tip>
+  The test framework automatically runs the analyzer, triggers the code fix, and
+  verifies the result matches `fixedSource`.
+</Tip>
+
+## RefactoringTest
+
+<Note>New in v1.14.0</Note>
+
+Base class for testing code refactoring providers (lightbulb suggestions without diagnostics).
+
+### Basic Usage
+
+```csharp
+using ANcpLua.Roslyn.Utilities.Testing;
+
+public class MakeStaticRefactoringTests : RefactoringTest<MakeStaticLambdaRefactoring>
+{
+    [Fact]
+    public Task ShouldMakeLambdaStatic() => VerifyAsync(
+        source: """
+            using System;
+            class C
+            {
+                Func<int, int> f = [|x => x * 2|];
+            }
+            """,
+        fixedSource: """
+            using System;
+            class C
+            {
+                Func<int, int> f = static x => x * 2;
+            }
+            """);
+}
+```
+
+<Note>
+  Use span markup `[|code|]` to mark the refactoring trigger location.
+</Note>
+
+### Verifying No Refactoring Offered
+
+```csharp
+[Fact]
+public Task ShouldNotOfferWhenAlreadyStatic() => VerifyNoRefactoringAsync("""
+    using System;
+    class C
+    {
+        Func<int, int> f = [|static x => x * 2|];
+    }
+    """);
+
+[Fact]
+public Task ShouldNotOfferWhenCapturing() => VerifyNoRefactoringAsync("""
+    using System;
+    class C
+    {
+        void M()
+        {
+            int captured = 5;
+            Func<int, int> f = [|x => x + captured|];
+        }
+    }
+    """);
+```
+
+## Method Reference
+
+### AnalyzerTest&lt;TAnalyzer&gt;
+
+| Method                                                       | Description                                                    |
+| ------------------------------------------------------------ | -------------------------------------------------------------- |
+| `VerifyAsync(source)`                                        | Verify analyzer produces expected diagnostics marked in source |
+| `VerifyAsync(source, additionalFiles, expectedDiagnostics?)` | Verify with additional files and explicit diagnostics          |
+
+### CodeFixTest&lt;TAnalyzer, TCodeFix&gt;
+
+| Method                             | Description                                          |
+| ---------------------------------- | ---------------------------------------------------- |
+| `VerifyAsync(source, fixedSource)` | Verify code fix transforms source to expected output |
+
+### RefactoringTest&lt;TRefactoring&gt;
+
+| Method                             | Description                                             |
+| ---------------------------------- | ------------------------------------------------------- |
+| `VerifyAsync(source, fixedSource)` | Verify refactoring transforms source to expected output |
+| `VerifyNoRefactoringAsync(source)` | Verify no refactoring is offered at the marked span     |
+
+## Integration Testing
+
+For testing that requires real MSBuild execution (SDK features, package behavior, build-time code generation), see [MSBuild Testing](/utilities/msbuild-testing).
+
+## Handling Type Ambiguity
+
+If you encounter ambiguous reference errors between `Microsoft.CodeAnalysis.Testing.AnalyzerTest` and `ANcpLua.Roslyn.Utilities.Testing.AnalyzerTest`, use a type alias:
+
+```csharp
+using AnalyzerTestBase = ANcpLua.Roslyn.Utilities.Testing.AnalyzerTest<MyAnalyzer>;
+
+public class MyTests : AnalyzerTestBase
+{
+    // ...
+}
+```
