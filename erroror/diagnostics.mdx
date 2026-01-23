@@ -1,0 +1,159 @@
+---
+title: Diagnostics
+description: ErrorOrX analyzer diagnostics reference
+icon: 'triangle-exclamation'
+---
+
+The ErrorOrX generator and analyzer emit diagnostics to help catch issues at compile time.
+
+## Endpoint Diagnostics
+
+### Handler Structure
+
+| ID     | Severity | Description                                       |
+| ------ | -------- | ------------------------------------------------- |
+| EOE001 | Error    | Invalid return type - must return `ErrorOr<T>`    |
+| EOE002 | Error    | Handler must be static                            |
+| EOE017 | Error    | Anonymous return type not supported               |
+| EOE020 | Error    | Inaccessible type (private/protected) in endpoint |
+| EOE021 | Error    | Type parameter not supported in return type       |
+
+### Route Validation
+
+| ID     | Severity | Description                                                           |
+| ------ | -------- | --------------------------------------------------------------------- |
+| EOE003 | Error    | Route parameter not bound to method parameter                         |
+| EOE004 | Error    | Duplicate route pattern detected                                      |
+| EOE005 | Error    | Invalid route pattern syntax                                          |
+| EOE023 | Warning  | Route constraint type mismatch (e.g., `{id:int}` with `string` param) |
+
+### Parameter Binding
+
+| ID     | Severity | Description                                             |
+| ------ | -------- | ------------------------------------------------------- |
+| EOE006 | Error    | Multiple body sources on single endpoint                |
+| EOE009 | Warning  | `[FromBody]` on GET/DELETE method                       |
+| EOE011 | Error    | Invalid `[FromRoute]` type                              |
+| EOE012 | Error    | Invalid `[FromQuery]` type                              |
+| EOE013 | Error    | Invalid `[AsParameters]` type                           |
+| EOE014 | Error    | `[AsParameters]` type has no accessible constructor     |
+| EOE016 | Error    | Invalid `[FromHeader]` type                             |
+| EOE018 | Error    | Nested `[AsParameters]` not supported                   |
+| EOE019 | Error    | Nullable `[AsParameters]` not supported                 |
+| EOE025 | Error    | Ambiguous parameter binding (GET/DELETE + complex type) |
+
+### AOT & Serialization
+
+| ID     | Severity | Description                                                     |
+| ------ | -------- | --------------------------------------------------------------- |
+| EOE007 | Warning  | Type not AOT-serializable                                       |
+| EOE030 | Info     | Too many result types for `Results<>` union (max 6)             |
+| EOE032 | Warning  | Unknown error factory method                                    |
+| EOE033 | Error    | Undocumented interface call                                     |
+| EOE040 | Warning  | Missing CamelCase JSON policy on user's `JsonSerializerContext` |
+
+### Response Attributes
+
+| ID     | Severity | Description                               |
+| ------ | -------- | ----------------------------------------- |
+| EOE010 | Warning  | `[AcceptedResponse]` on GET/DELETE method |
+
+## API Versioning Diagnostics
+
+| ID     | Severity | Description                                                          |
+| ------ | -------- | -------------------------------------------------------------------- |
+| EOE050 | Error    | `[ApiVersionNeutral]` and `[MapToApiVersion]` are mutually exclusive |
+| EOE051 | Error    | `[MapToApiVersion]` references undeclared version                    |
+| EOE052 | Error    | `Asp.Versioning.Http` package not referenced                         |
+| EOE053 | Warning  | Endpoint missing versioning when others use it                       |
+| EOE054 | Error    | Invalid version format                                               |
+
+## Common Fixes
+
+### EOE001: Invalid Return Type
+
+```csharp
+// ❌ Wrong
+[Get("/todos")]
+public static List<Todo> GetAll() => _db.GetAll();
+
+// ✅ Correct
+[Get("/todos")]
+public static ErrorOr<List<Todo>> GetAll() => _db.GetAll();
+```
+
+### EOE002: Handler Must Be Static
+
+```csharp
+// ❌ Wrong
+public class TodoEndpoints
+{
+    [Get("/todos")]
+    public ErrorOr<List<Todo>> GetAll() => ...
+}
+
+// ✅ Correct
+public static class TodoEndpoints
+{
+    [Get("/todos")]
+    public static ErrorOr<List<Todo>> GetAll() => ...
+}
+```
+
+### EOE003: Route Parameter Not Bound
+
+```csharp
+// ❌ Wrong - 'id' in route but not in params
+[Get("/todos/{id}")]
+public static ErrorOr<Todo> Get() => ...
+
+// ✅ Correct
+[Get("/todos/{id}")]
+public static ErrorOr<Todo> Get(int id) => ...
+```
+
+### EOE004: Duplicate Route
+
+```csharp
+// ❌ Wrong - same route pattern
+[Get("/todos/{id}")]
+public static ErrorOr<Todo> GetById(int id) => ...
+
+[Get("/todos/{todoId}")]  // EOE004: Duplicate of /todos/{id}
+public static ErrorOr<Todo> GetByTodoId(int todoId) => ...
+```
+
+### EOE025: Ambiguous Parameter Binding
+
+```csharp
+// ❌ Wrong - complex type on GET without explicit binding
+[Get("/todos")]
+public static ErrorOr<List<Todo>> Search(SearchFilter filter) => ...
+
+// ✅ Option 1: Explicit FromQuery
+[Get("/todos")]
+public static ErrorOr<List<Todo>> Search([FromQuery] SearchFilter filter) => ...
+
+// ✅ Option 2: AsParameters
+[Get("/todos")]
+public static ErrorOr<List<Todo>> Search([AsParameters] SearchFilter filter) => ...
+
+// ✅ Option 3: FromBody (if intentional)
+[Get("/todos")]
+public static ErrorOr<List<Todo>> Search([FromBody] SearchFilter filter) => ...
+```
+
+### EOE040: Missing CamelCase Policy
+
+```csharp
+// ❌ Wrong - no naming policy
+[JsonSerializable(typeof(Todo))]
+internal partial class AppJsonContext : JsonSerializerContext { }
+
+// ✅ Correct
+[JsonSourceGenerationOptions(
+    PropertyNamingPolicy = JsonKnownNamingPolicy.CamelCase,
+    DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull)]
+[JsonSerializable(typeof(Todo))]
+internal partial class AppJsonContext : JsonSerializerContext { }
+```

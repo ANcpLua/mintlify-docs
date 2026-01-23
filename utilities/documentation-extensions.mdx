@@ -1,0 +1,170 @@
+---
+title: Documentation Extensions
+description: Retrieve XML documentation comments with inheritdoc expansion
+icon: 'file-lines'
+---
+
+Extension methods for retrieving and processing XML documentation comments from Roslyn symbols.
+
+## Features
+
+- Retrieve XML documentation from symbols
+- Automatic `inheritdoc` expansion
+- Support for `cref` and `path` attributes
+- Type parameter reference rewriting
+- Circular reference prevention
+
+## Basic Usage
+
+```csharp
+// Get documentation with inheritdoc expansion
+string docs = method.GetDocumentationComment(
+    compilation,
+    expandInheritdoc: true);
+
+// Get plain text summary (whitespace normalized)
+string? summary = method.GetSummaryText(compilation);
+
+// Get plain text remarks
+string? remarks = method.GetRemarksText(compilation);
+```
+
+## Inheritdoc Expansion
+
+The library automatically resolves `inheritdoc` elements:
+
+```csharp
+/// <inheritdoc/>
+public override void Dispose() { }
+
+// GetDocumentationComment returns the base class documentation
+```
+
+### Supported Scenarios
+
+| Pattern                         | Resolution                                                |
+| ------------------------------- | --------------------------------------------------------- |
+| `<inheritdoc/>`                 | Base member, interface implementation, or override target |
+| `<inheritdoc cref="Member"/>`   | Specified member's documentation                          |
+| `<inheritdoc path="/summary"/>` | Only the specified XPath elements                         |
+
+### Automatic Synthesis
+
+For symbols without documentation that are eligible for inheritance:
+
+```csharp
+// Override methods - inherits from base
+public override void Execute() { }
+
+// Explicit interface implementations - inherits from interface
+void IDisposable.Dispose() { }
+
+// Implicit interface implementations - inherits from interface
+public void Dispose() { }
+```
+
+## GetDocumentationComment
+
+Full signature with all options:
+
+```csharp
+string docs = symbol.GetDocumentationComment(
+    compilation,
+    preferredCulture: null,      // Culture for localized docs
+    expandIncludes: false,       // Expand <include> elements
+    expandInheritdoc: true,      // Expand <inheritdoc> elements
+    cancellationToken: ct);
+```
+
+| Parameter           | Description                                                       |
+| ------------------- | ----------------------------------------------------------------- |
+| `compilation`       | The compilation containing the symbol                             |
+| `preferredCulture`  | Culture for localized documentation (null for default)            |
+| `expandIncludes`    | Whether to expand `<include>` elements referencing external files |
+| `expandInheritdoc`  | Whether to resolve and inline `<inheritdoc>` elements             |
+| `cancellationToken` | Cancellation token                                                |
+
+## GetSummaryText / GetRemarksText
+
+Convenience methods that extract and normalize specific documentation sections:
+
+```csharp
+// Returns plain text with whitespace normalized
+string? summary = symbol.GetSummaryText(compilation, ct);
+string? remarks = symbol.GetRemarksText(compilation, ct);
+```
+
+- Returns `null` if no documentation or section not found
+- Whitespace is normalized (multiple spaces collapsed to single space)
+- XML tags are stripped, leaving plain text
+
+## Examples
+
+### Generate API Documentation
+
+```csharp
+foreach (var method in type.GetMembers().OfType<IMethodSymbol>())
+{
+    var summary = method.GetSummaryText(compilation);
+    if (summary != null)
+    {
+        sb.AppendLine($"/// <summary>");
+        sb.AppendLine($"/// {summary}");
+        sb.AppendLine($"/// </summary>");
+    }
+}
+```
+
+### Copy Documentation to Generated Code
+
+```csharp
+var originalDocs = sourceMethod.GetDocumentationComment(
+    compilation,
+    expandInheritdoc: true);
+
+if (!string.IsNullOrEmpty(originalDocs))
+{
+    // Parse and transform documentation for generated method
+    var doc = XElement.Parse(originalDocs);
+    // ... transform as needed
+}
+```
+
+### Check for Missing Documentation
+
+```csharp
+foreach (var member in type.GetMembers())
+{
+    if (member.DeclaredAccessibility == Accessibility.Public)
+    {
+        var summary = member.GetSummaryText(compilation);
+        if (summary == null)
+        {
+            context.ReportDiagnostic(
+                Diagnostic.Create(MissingDocumentation, member.Locations[0]));
+        }
+    }
+}
+```
+
+## Type Parameter Rewriting
+
+When inheriting documentation from generic types, type parameter references are automatically rewritten:
+
+```csharp
+// Base class
+/// <summary>Processes items of type <typeparamref name="T"/>.</summary>
+public abstract class Processor<T> { }
+
+// Derived class
+public class StringProcessor : Processor<string> { }
+
+// GetDocumentationComment for StringProcessor returns:
+// "Processes items of type <see cref="T:System.String"/>."
+```
+
+## Performance Considerations
+
+- Use `expandInheritdoc: false` when you don't need inheritance resolution
+- Cache `GetDocumentationComment` results when processing many symbols
+- The method handles circular `inheritdoc` references without infinite loops

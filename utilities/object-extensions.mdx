@@ -1,0 +1,296 @@
+---
+title: Object Extensions
+description: Safe casting, type checking, and reflection helpers
+icon: 'cube'
+---
+
+Extension methods for `object` providing safe casting, type checking, and reflection utilities.
+
+## Safe Casting
+
+### As (Reference Types)
+
+Safely cast with fluent syntax:
+
+```csharp
+// Before: parentheses required for chaining
+var method = (symbol as IMethodSymbol)?.Parameters;
+
+// After: more readable chaining
+var method = symbol.As<IMethodSymbol>()?.Parameters;
+```
+
+### AsValue (Value Types)
+
+Safely unbox value types:
+
+```csharp
+object boxedInt = 42;
+int? value = boxedInt.AsValue<int>();  // 42
+
+object boxedString = "hello";
+int? value2 = boxedString.AsValue<int>();  // null (not exception)
+```
+
+## Type Checking with Casting
+
+### Is (Reference Types)
+
+Combine type check and cast in one operation:
+
+```csharp
+if (symbol.Is<IMethodSymbol>(out var method))
+{
+    // method is guaranteed non-null here
+    ProcessMethod(method);
+}
+```
+
+### IsValue (Value Types)
+
+Same pattern for value types:
+
+```csharp
+if (constantValue.IsValue<int>(out var intValue))
+{
+    ProcessInt(intValue);
+}
+```
+
+### CastTo (Throwing Cast)
+
+When you're certain of the type and want a clear exception on failure:
+
+```csharp
+// Throws InvalidCastException with clear message if wrong type
+var method = symbol.CastTo<IMethodSymbol>();
+```
+
+## Reflection Helpers
+
+Safe property access without catching exceptions.
+
+### HasProperty
+
+Check if a property exists:
+
+```csharp
+if (obj.HasProperty("Name"))
+{
+    var name = obj.TryGetPropertyValue<string>("Name");
+}
+```
+
+### TryGetPropertyValue
+
+Get property values safely:
+
+```csharp
+// With default value
+var name = obj.TryGetPropertyValue<string>("Name", "Unknown");
+var id = obj.TryGetPropertyValue<int>("Id", -1);
+var isActive = obj.TryGetPropertyValue<bool>("IsActive", false);
+
+// Try-pattern
+if (obj.TryGetPropertyValue<string>("Name", out var name))
+{
+    Console.WriteLine(name);
+}
+```
+
+Returns default when:
+
+- Object is null
+- Property doesn't exist
+- Property value is null
+- Property value cannot be cast to the requested type
+
+## Equality and Comparison
+
+### EqualsTo
+
+Null-safe equality comparison:
+
+```csharp
+if (value1.EqualsTo(value2))
+{
+    // Values are equal (both null counts as equal)
+}
+```
+
+### IsOneOf / IsNotOneOf
+
+Check if a value is one of several options:
+
+```csharp
+if (status.IsOneOf(Status.Active, Status.Pending))
+{
+    // Process active or pending status
+}
+
+if (status.IsNotOneOf(Status.Deleted, Status.Archived))
+{
+    // Process non-deleted, non-archived items
+}
+
+// Works with any type
+if (extension.IsOneOf(".cs", ".vb", ".fs"))
+{
+    // It's a .NET source file
+}
+```
+
+## Null Utilities
+
+### IfNotNull (Action)
+
+Execute an action if not null:
+
+```csharp
+// Before
+if (logger != null)
+{
+    logger.Log(message);
+}
+
+// After
+logger.IfNotNull(l => l.Log(message));
+```
+
+### IfNotNull (Transform)
+
+Transform if not null, return default otherwise:
+
+```csharp
+// Before
+var length = str != null ? str.Length : 0;
+
+// After
+var length = str.IfNotNull(s => s.Length) ?? 0;
+
+// Complex transformations
+var info = user.IfNotNull(u => new { u.Name, u.Email });
+```
+
+### IfNotNull with Default
+
+Transform with explicit default:
+
+```csharp
+var displayName = user.IfNotNull(u => u.Name, "Guest");
+var itemCount = list.IfNotNull(l => l.Count, 0);
+```
+
+## Examples
+
+### Processing Roslyn Symbols
+
+```csharp
+public void ProcessSymbol(ISymbol symbol)
+{
+    // Pattern: check type and cast
+    if (symbol.Is<IMethodSymbol>(out var method))
+    {
+        if (method.IsAsync)
+        {
+            ProcessAsyncMethod(method);
+        }
+    }
+    else if (symbol.Is<IPropertySymbol>(out var property))
+    {
+        if (property.IsReadOnly)
+        {
+            ProcessReadOnlyProperty(property);
+        }
+    }
+}
+```
+
+### Duck Typing with Reflection
+
+```csharp
+public T? GetDuckTypedValue<T>(object obj)
+{
+    // Safely access properties on unknown types
+    if (obj.HasProperty("Value"))
+    {
+        return obj.TryGetPropertyValue<T>("Value");
+    }
+
+    // Try alternative property name
+    if (obj.HasProperty("Data"))
+    {
+        return obj.TryGetPropertyValue<T>("Data");
+    }
+
+    return default;
+}
+```
+
+### State Machine with IsOneOf
+
+```csharp
+public bool CanTransitionTo(OrderState newState)
+{
+    return _currentState switch
+    {
+        OrderState.Draft when newState.IsOneOf(OrderState.Pending, OrderState.Cancelled) => true,
+        OrderState.Pending when newState.IsOneOf(OrderState.Processing, OrderState.Cancelled) => true,
+        OrderState.Processing when newState.IsOneOf(OrderState.Shipped, OrderState.Cancelled) => true,
+        OrderState.Shipped when newState == OrderState.Delivered => true,
+        _ => false
+    };
+}
+```
+
+### Optional Processing
+
+```csharp
+public string BuildGreeting(User? user)
+{
+    return user
+        .IfNotNull(u => u.PreferredName)
+        .IfNotNull(name => $"Hello, {name}!")
+        ?? "Welcome, guest!";
+}
+```
+
+## API Reference
+
+### Safe Casting
+
+| Method                   | Description                                     |
+| ------------------------ | ----------------------------------------------- |
+| `As<T>()`                | Cast to reference type, returns null on failure |
+| `AsValue<T>()`           | Unbox to value type, returns null on failure    |
+| `Is<T>(out result)`      | Type check + cast for reference types           |
+| `IsValue<T>(out result)` | Type check + unbox for value types              |
+| `CastTo<T>()`            | Cast or throw `InvalidCastException`            |
+
+### Reflection
+
+| Method                                    | Description                              |
+| ----------------------------------------- | ---------------------------------------- |
+| `HasProperty(name)`                       | Check if public instance property exists |
+| `TryGetPropertyValue<T>(name, default)`   | Get property value or default            |
+| `TryGetPropertyValue<T>(name, out value)` | Try-pattern property access              |
+
+### Equality
+
+| Method                  | Description                             |
+| ----------------------- | --------------------------------------- |
+| `EqualsTo<T>(other)`    | Null-safe equality comparison           |
+| `IsOneOf<T>(values)`    | Check if equals any of the values       |
+| `IsNotOneOf<T>(values)` | Check if not equal to any of the values |
+
+### Null Utilities
+
+| Method                                     | Description                                               |
+| ------------------------------------------ | --------------------------------------------------------- |
+| `IfNotNull<T>(action)`                     | Execute action if not null                                |
+| `IfNotNull<T, TResult>(selector)`          | Transform if not null, return default otherwise           |
+| `IfNotNull<T, TResult>(selector, default)` | Transform if not null, return specified default otherwise |
+
+<Tip>
+The `Is<T>` and `IsValue<T>` methods are particularly useful in switch statements or when you need both the type check and the cast result in one operation.
+</Tip>

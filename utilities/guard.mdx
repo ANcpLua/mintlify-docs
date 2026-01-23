@@ -1,0 +1,260 @@
+---
+title: Guard
+description: Clean argument validation with automatic parameter name capture
+icon: 'shield'
+---
+
+Guard clauses for argument validation with `CallerArgumentExpression` for automatic parameter name capture.
+
+## The Problem
+
+Standard null checks are verbose and require `nameof`:
+
+```csharp
+// BAD: Verbose and repetitive
+public void Process(string? name, IService? service)
+{
+    _name = name ?? throw new ArgumentNullException(nameof(name));
+    _service = service ?? throw new ArgumentNullException(nameof(service));
+}
+```
+
+## The Solution
+
+```csharp
+// GOOD: Clean and expressive
+public void Process(string? name, IService? service)
+{
+    _name = Guard.NotNull(name);
+    _service = Guard.NotNull(service);
+}
+```
+
+The parameter name is automatically captured - no `nameof` required.
+
+## Null Validation
+
+### NotNull
+
+Validates non-null and returns the value:
+
+```csharp
+// Throws ArgumentNullException if null
+var validated = Guard.NotNull(possiblyNullValue);
+
+// Can be used inline
+ProcessItem(Guard.NotNull(item));
+
+// In constructors
+public MyClass(ILogger? logger, IConfig? config)
+{
+    _logger = Guard.NotNull(logger);
+    _config = Guard.NotNull(config);
+}
+```
+
+### NotNullOr
+
+Returns value or default (no exception):
+
+```csharp
+// Reference types
+var name = Guard.NotNullOr(user?.Name, "Anonymous");
+var service = Guard.NotNullOr(optionalService, DefaultService.Instance);
+
+// Value types
+int count = Guard.NotNullOr(maybeCount, 0);
+```
+
+## String Validation
+
+### NotNullOrEmpty
+
+Validates non-null and non-empty strings:
+
+```csharp
+public void SetName(string? name)
+{
+    _name = Guard.NotNullOrEmpty(name);
+    // Throws ArgumentNullException if null
+    // Throws ArgumentException if empty
+}
+```
+
+### NotNullOrWhiteSpace
+
+Validates strings contain meaningful content:
+
+```csharp
+public void SetDescription(string? description)
+{
+    _description = Guard.NotNullOrWhiteSpace(description);
+    // Throws if null, empty, or only whitespace
+}
+```
+
+### With Defaults
+
+```csharp
+// Return default if null/empty
+var displayName = Guard.NotNullOrEmptyOr(user.DisplayName, user.Username);
+
+// Return default if null/empty/whitespace
+var title = Guard.NotNullOrWhiteSpaceOr(article.Title, "Untitled");
+```
+
+## Collection Validation
+
+```csharp
+public void ProcessItems(IReadOnlyCollection<Item>? items)
+{
+    var validItems = Guard.NotNullOrEmpty(items);
+    // Throws ArgumentNullException if null
+    // Throws ArgumentException if empty
+
+    foreach (var item in validItems)
+    {
+        // Process items
+    }
+}
+```
+
+## Range Validation
+
+### InRange
+
+Validates value is within bounds (inclusive):
+
+```csharp
+public void SetPage(int page)
+{
+    _page = Guard.InRange(page, 1, 100);
+    // Throws ArgumentOutOfRangeException if outside range
+}
+
+// Works with any IComparable<T>
+var temperature = Guard.InRange(temp, -40.0, 100.0);
+var date = Guard.InRange(eventDate, DateTime.Today, DateTime.Today.AddYears(1));
+```
+
+### ValidIndex
+
+Validates array/list index:
+
+```csharp
+public T GetItem(int index)
+{
+    Guard.ValidIndex(index, _items.Count);
+    return _items[index];
+}
+```
+
+## Condition Validation
+
+### That
+
+Validates a boolean condition:
+
+```csharp
+public void SetAge(int age)
+{
+    Guard.That(age >= 0, "Age cannot be negative.");
+    _age = age;
+}
+```
+
+### Satisfies
+
+Validates value matches a predicate:
+
+```csharp
+public void SetEmail(string email)
+{
+    _email = Guard.Satisfies(email, e => e.Contains('@'), "Invalid email format.");
+}
+
+// Complex validation
+_config = Guard.Satisfies(config, c =>
+    c.Timeout > TimeSpan.Zero && c.MaxRetries >= 0,
+    "Invalid configuration values.");
+```
+
+## Examples
+
+### Constructor Validation
+
+```csharp
+public class OrderProcessor
+{
+    private readonly IOrderRepository _repository;
+    private readonly IPaymentService _payment;
+    private readonly ILogger _logger;
+
+    public OrderProcessor(
+        IOrderRepository? repository,
+        IPaymentService? payment,
+        ILogger? logger)
+    {
+        _repository = Guard.NotNull(repository);
+        _payment = Guard.NotNull(payment);
+        _logger = Guard.NotNull(logger);
+    }
+}
+```
+
+### Method Parameter Validation
+
+```csharp
+public async Task<Order> CreateOrderAsync(
+    string? customerId,
+    IReadOnlyCollection<OrderItem>? items,
+    decimal discount)
+{
+    var validCustomerId = Guard.NotNullOrWhiteSpace(customerId);
+    var validItems = Guard.NotNullOrEmpty(items);
+    var validDiscount = Guard.InRange(discount, 0m, 100m);
+
+    // All parameters validated
+    return await ProcessOrder(validCustomerId, validItems, validDiscount);
+}
+```
+
+### Configuration Validation
+
+```csharp
+public class ServerConfig
+{
+    public int Port { get; }
+    public string Host { get; }
+    public TimeSpan Timeout { get; }
+
+    public ServerConfig(int port, string? host, TimeSpan timeout)
+    {
+        Port = Guard.InRange(port, 1, 65535);
+        Host = Guard.NotNullOrWhiteSpace(host);
+        Timeout = Guard.Satisfies(timeout, t => t > TimeSpan.Zero, "Timeout must be positive.");
+    }
+}
+```
+
+## API Reference
+
+| Method                                    | Throws                                       | Description                   |
+| ----------------------------------------- | -------------------------------------------- | ----------------------------- |
+| `NotNull<T>(value)`                       | `ArgumentNullException`                      | Validates non-null            |
+| `NotNullOr<T>(value, default)`            | -                                            | Returns value or default      |
+| `NotNullOrEmpty(string)`                  | `ArgumentNullException`, `ArgumentException` | Validates non-null, non-empty |
+| `NotNullOrWhiteSpace(string)`             | `ArgumentNullException`, `ArgumentException` | Validates has content         |
+| `NotNullOrEmptyOr(string, default)`       | -                                            | Returns value or default      |
+| `NotNullOrWhiteSpaceOr(string, default)`  | -                                            | Returns value or default      |
+| `NotNullOrEmpty<T>(collection)`           | `ArgumentNullException`, `ArgumentException` | Validates collection          |
+| `InRange<T>(value, min, max)`             | `ArgumentOutOfRangeException`                | Validates within bounds       |
+| `ValidIndex(index, count)`                | `ArgumentOutOfRangeException`                | Validates array index         |
+| `That(condition, message)`                | `ArgumentException`                          | Validates condition           |
+| `Satisfies<T>(value, predicate, message)` | `ArgumentException`                          | Validates with predicate      |
+
+<Note>
+  All validation methods use `CallerArgumentExpressionAttribute` to
+  automatically capture the parameter name in exception messages - no `nameof()`
+  required.
+</Note>

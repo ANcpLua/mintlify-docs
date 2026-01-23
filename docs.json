@@ -20,7 +20,7 @@
     "twitter:card": "summary_large_image"
   },
   "search": {
-    "prompt": "Search SDK, analyzers, utilities..."
+    "prompt": "Search SDK, analyzers, utilities, ErrorOrX..."
   },
   "seo": {
     "indexing": "navigable"
@@ -29,12 +29,12 @@
     "playground": {
       "mode": "show"
     },
-    "baseUrl": ["http://localhost:5100", "https://api.qyl.dev"]
+    "baseUrl": "http://localhost:5100"
   },
   "navigation": {
     "tabs": [
       {
-        "tab": "Documentation",
+        "tab": "Framework",
         "groups": [
           {
             "group": "Getting Started",
@@ -109,7 +109,14 @@
               "utilities/patterns",
               "utilities/operations",
               "utilities/symbols",
+              "utilities/attribute-extensions",
+              "utilities/documentation-extensions",
               "utilities/string-extensions",
+              "utilities/string-comparison",
+              "utilities/object-extensions",
+              "utilities/nullable-extensions",
+              "utilities/try-extensions",
+              "utilities/guard",
               "utilities/codegen",
               "utilities/semantic-guard",
               "utilities/msbuild-properties",
@@ -120,11 +127,124 @@
         ]
       },
       {
-        "tab": "API Reference",
+        "tab": "ErrorOrX",
         "groups": [
           {
-            "group": "qyl API",
+            "group": "ErrorOrX",
+            "pages": [
+              "erroror/overview",
+              "erroror/http-mapping",
+              "erroror/generator",
+              "erroror/diagnostics"
+            ]
+          }
+        ]
+      },
+      {
+        "tab": "qyl API",
+        "groups": [
+          {
+            "group": "Overview",
             "pages": ["api-reference/introduction"]
+          },
+          {
+            "group": "Health",
+            "pages": [
+              "api-reference/endpoint/HealthApi_check",
+              "api-reference/endpoint/HealthApi_live",
+              "api-reference/endpoint/HealthApi_ready"
+            ]
+          },
+          {
+            "group": "Traces",
+            "pages": [
+              "api-reference/endpoint/TracesApi_list",
+              "api-reference/endpoint/TracesApi_search",
+              "api-reference/endpoint/TracesApi_get",
+              "api-reference/endpoint/TracesApi_getSpans"
+            ]
+          },
+          {
+            "group": "Logs",
+            "pages": [
+              "api-reference/endpoint/LogsApi_list",
+              "api-reference/endpoint/LogsApi_search",
+              "api-reference/endpoint/LogsApi_aggregate",
+              "api-reference/endpoint/LogsApi_getPatterns",
+              "api-reference/endpoint/LogsApi_getStats"
+            ]
+          },
+          {
+            "group": "Metrics",
+            "pages": [
+              "api-reference/endpoint/MetricsApi_list",
+              "api-reference/endpoint/MetricsApi_query",
+              "api-reference/endpoint/MetricsApi_getMetadata"
+            ]
+          },
+          {
+            "group": "Sessions",
+            "pages": [
+              "api-reference/endpoint/SessionsApi_list",
+              "api-reference/endpoint/SessionsApi_get",
+              "api-reference/endpoint/SessionsApi_getTraces",
+              "api-reference/endpoint/SessionsApi_getStats"
+            ]
+          },
+          {
+            "group": "Errors",
+            "pages": [
+              "api-reference/endpoint/ErrorsApi_list",
+              "api-reference/endpoint/ErrorsApi_get",
+              "api-reference/endpoint/ErrorsApi_update",
+              "api-reference/endpoint/ErrorsApi_getStats",
+              "api-reference/endpoint/ErrorsApi_getCorrelations"
+            ]
+          },
+          {
+            "group": "Exceptions",
+            "pages": [
+              "api-reference/endpoint/ExceptionsApi_list",
+              "api-reference/endpoint/ExceptionsApi_getStats"
+            ]
+          },
+          {
+            "group": "Deployments",
+            "pages": [
+              "api-reference/endpoint/DeploymentsApi_list",
+              "api-reference/endpoint/DeploymentsApi_create",
+              "api-reference/endpoint/DeploymentsApi_get",
+              "api-reference/endpoint/DeploymentsApi_update",
+              "api-reference/endpoint/DeploymentsApi_getDoraMetrics"
+            ]
+          },
+          {
+            "group": "CI/CD",
+            "pages": [
+              "api-reference/endpoint/PipelinesApi_list",
+              "api-reference/endpoint/PipelinesApi_getStats"
+            ]
+          },
+          {
+            "group": "Services",
+            "pages": [
+              "api-reference/endpoint/ServicesApi_list",
+              "api-reference/endpoint/ServicesApi_get",
+              "api-reference/endpoint/ServicesApi_getDependencies",
+              "api-reference/endpoint/ServicesApi_getOperations"
+            ]
+          },
+          {
+            "group": "Streaming",
+            "pages": [
+              "api-reference/endpoint/StreamingApi_streamEvents",
+              "api-reference/endpoint/StreamingApi_streamTraces",
+              "api-reference/endpoint/StreamingApi_streamTraceSpans",
+              "api-reference/endpoint/StreamingApi_streamLogs",
+              "api-reference/endpoint/StreamingApi_streamMetrics",
+              "api-reference/endpoint/StreamingApi_streamExceptions",
+              "api-reference/endpoint/StreamingApi_streamDeployments"
+            ]
           }
         ],
         "openapi": "/api-reference/openapi.yaml"
@@ -221,6 +341,10 @@
     {
       "source": "/roslyn/:slug*",
       "destination": "/utilities/:slug*"
+    },
+    {
+      "source": "/erroror",
+      "destination": "/erroror/overview"
     }
   ]
 }

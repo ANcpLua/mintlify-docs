@@ -1,0 +1,343 @@
+---
+title: String Comparison
+description: Explicit string comparison semantics for readable, correct code
+icon: 'equals'
+---
+
+Extension methods providing explicit string comparison semantics, making comparison intentions clear and code more readable.
+
+## The Problem
+
+`StringComparison` enums are easy to forget and make code verbose:
+
+```csharp
+// BAD: Easy to forget the comparison, verbose when included
+if (string.Equals(str1, str2, StringComparison.OrdinalIgnoreCase)) { }
+if (str.StartsWith(prefix, StringComparison.Ordinal)) { }
+```
+
+## The Solution
+
+```csharp
+// GOOD: Self-documenting comparison intent
+if (str1.EqualsIgnoreCase(str2)) { }
+if (str.StartsWithOrdinal(prefix)) { }
+```
+
+## Equality Comparisons
+
+### Ordinal (Case-Sensitive)
+
+Byte-by-byte comparison - fastest, use for identifiers and technical strings:
+
+```csharp
+if (methodName.EqualsOrdinal("Dispose"))
+{
+    // Exact match
+}
+
+// Check multiple values
+if (httpMethod.EqualsAnyOrdinal("GET", "POST", "PUT"))
+{
+    // One of the allowed methods
+}
+```
+
+### Case-Insensitive
+
+Culture-invariant case-insensitive comparison:
+
+```csharp
+if (extension.EqualsIgnoreCase(".cs"))
+{
+    // It's a C# file (case doesn't matter)
+}
+
+// Multiple values
+if (fileExtension.EqualsAnyIgnoreCase(".jpg", ".jpeg", ".png", ".gif"))
+{
+    // It's an image file
+}
+```
+
+## Contains Comparisons
+
+### Ordinal Contains
+
+```csharp
+if (path.ContainsOrdinal("/api/"))
+{
+    // It's an API route
+}
+
+// Multiple substrings
+if (line.ContainsAnyOrdinal("TODO", "FIXME", "HACK"))
+{
+    // Found a code comment marker
+}
+```
+
+### Case-Insensitive Contains
+
+```csharp
+if (userInput.ContainsIgnoreCase("error"))
+{
+    // User mentioned an error
+}
+
+// Multiple substrings
+if (log.ContainsAnyIgnoreCase("exception", "error", "fail"))
+{
+    // Found an error indicator
+}
+```
+
+## Prefix/Suffix Checks
+
+### StartsWith
+
+```csharp
+// Ordinal
+if (line.StartsWithOrdinal("//"))
+{
+    // It's a comment
+}
+
+// Case-insensitive
+if (url.StartsWithIgnoreCase("https://"))
+{
+    // It's a secure URL
+}
+
+// Multiple prefixes
+if (typeName.StartsWithAnyOrdinal("System.", "Microsoft."))
+{
+    // It's a framework type
+}
+
+if (url.StartsWithAnyIgnoreCase("http://", "https://"))
+{
+    // It's a URL
+}
+```
+
+### EndsWith
+
+```csharp
+// Ordinal
+if (fileName.EndsWithOrdinal(".cs"))
+{
+    // It's a C# source file
+}
+
+// Case-insensitive (useful for Windows paths)
+if (fileName.EndsWithIgnoreCase(".XML"))
+{
+    // It's an XML file
+}
+
+// Multiple suffixes
+if (fileName.EndsWithAnyOrdinal(".cs", ".vb", ".fs"))
+{
+    // It's a .NET source file
+}
+```
+
+## IndexOf
+
+```csharp
+// Ordinal
+int index = str.IndexOfOrdinal("pattern");
+
+// Case-insensitive
+int index = str.IndexOfIgnoreCase("PATTERN");
+```
+
+## Replace
+
+```csharp
+// Case-insensitive replace
+var result = "Hello WORLD".ReplaceIgnoreCase("world", "everyone");
+// result: "Hello everyone"
+```
+
+## Null/Empty Checks
+
+Fluent alternatives to `string.IsNullOrEmpty`:
+
+```csharp
+// Check for null/empty
+if (input.IsNullOrEmpty())
+{
+    return defaultValue;
+}
+
+// Check for null/empty/whitespace
+if (input.IsNullOrWhiteSpace())
+{
+    return defaultValue;
+}
+
+// Positive checks (inverse)
+if (name.HasValue())
+{
+    greetings.Add($"Hello, {name}!");
+}
+
+if (description.HasContent())
+{
+    AddDescription(description);
+}
+```
+
+### NullIf Normalization
+
+Convert empty/whitespace strings to null for easier null-coalescing:
+
+```csharp
+// Null if empty
+var name = input.NullIfEmpty() ?? "Default";
+
+// Null if whitespace
+var description = input.NullIfWhiteSpace() ?? "No description provided";
+```
+
+## Truncation
+
+```csharp
+// Simple truncation
+var shortName = longName.Truncate(50);
+
+// With ellipsis
+var preview = description.TruncateWithEllipsis(100);
+// "This is a very long description that..." (100 chars total)
+
+// Custom ellipsis
+var title = text.TruncateWithEllipsis(50, "\u2026"); // Unicode ellipsis
+```
+
+## Examples
+
+### File Type Detection
+
+```csharp
+public static FileType DetectFileType(string fileName)
+{
+    if (fileName.EndsWithAnyIgnoreCase(".cs", ".vb", ".fs"))
+        return FileType.DotNetSource;
+
+    if (fileName.EndsWithAnyIgnoreCase(".js", ".ts", ".jsx", ".tsx"))
+        return FileType.JavaScript;
+
+    if (fileName.EndsWithAnyIgnoreCase(".json", ".xml", ".yaml", ".yml"))
+        return FileType.Config;
+
+    return FileType.Unknown;
+}
+```
+
+### URL Validation
+
+```csharp
+public static bool IsValidApiUrl(string url)
+{
+    return url.StartsWithIgnoreCase("https://") &&
+           url.ContainsOrdinal("/api/") &&
+           !url.ContainsAnyOrdinal("..", "//api//");
+}
+```
+
+### Log Parsing
+
+```csharp
+public static LogLevel ParseLogLevel(string line)
+{
+    if (line.ContainsAnyIgnoreCase("[error]", "[err]", "[fatal]"))
+        return LogLevel.Error;
+
+    if (line.ContainsAnyIgnoreCase("[warn]", "[warning]"))
+        return LogLevel.Warning;
+
+    if (line.ContainsIgnoreCase("[debug]"))
+        return LogLevel.Debug;
+
+    return LogLevel.Info;
+}
+```
+
+### Input Normalization
+
+```csharp
+public static string NormalizeInput(string? input)
+{
+    return input
+        .NullIfWhiteSpace()
+        ?.Trim()
+        .TruncateWithEllipsis(200)
+        ?? string.Empty;
+}
+```
+
+## API Reference
+
+### Equality
+
+| Method                        | Comparison                           |
+| ----------------------------- | ------------------------------------ |
+| `EqualsOrdinal(other)`        | `StringComparison.Ordinal`           |
+| `EqualsIgnoreCase(other)`     | `StringComparison.OrdinalIgnoreCase` |
+| `EqualsAnyOrdinal(values)`    | Any value, ordinal                   |
+| `EqualsAnyIgnoreCase(values)` | Any value, ignore case               |
+
+### Contains
+
+| Method                              | Comparison                           |
+| ----------------------------------- | ------------------------------------ |
+| `ContainsOrdinal(substring)`        | `StringComparison.Ordinal`           |
+| `ContainsIgnoreCase(substring)`     | `StringComparison.OrdinalIgnoreCase` |
+| `ContainsAnyOrdinal(substrings)`    | Any substring, ordinal               |
+| `ContainsAnyIgnoreCase(substrings)` | Any substring, ignore case           |
+
+### StartsWith/EndsWith
+
+| Method                              | Comparison                           |
+| ----------------------------------- | ------------------------------------ |
+| `StartsWithOrdinal(prefix)`         | `StringComparison.Ordinal`           |
+| `StartsWithIgnoreCase(prefix)`      | `StringComparison.OrdinalIgnoreCase` |
+| `StartsWithAnyOrdinal(prefixes)`    | Any prefix, ordinal                  |
+| `StartsWithAnyIgnoreCase(prefixes)` | Any prefix, ignore case              |
+| `EndsWithOrdinal(suffix)`           | `StringComparison.Ordinal`           |
+| `EndsWithIgnoreCase(suffix)`        | `StringComparison.OrdinalIgnoreCase` |
+| `EndsWithAnyOrdinal(suffixes)`      | Any suffix, ordinal                  |
+| `EndsWithAnyIgnoreCase(suffixes)`   | Any suffix, ignore case              |
+
+### IndexOf/Replace
+
+| Method                         | Description                               |
+| ------------------------------ | ----------------------------------------- |
+| `IndexOfOrdinal(substring)`    | Index with ordinal comparison             |
+| `IndexOfIgnoreCase(substring)` | Index with case-insensitive comparison    |
+| `ReplaceIgnoreCase(old, new)`  | Replace all occurrences, case-insensitive |
+
+### Null/Empty Checks
+
+| Method                 | Returns `true` when                      |
+| ---------------------- | ---------------------------------------- |
+| `IsNullOrEmpty()`      | null or empty                            |
+| `IsNullOrWhiteSpace()` | null, empty, or whitespace only          |
+| `HasValue()`           | not null and not empty                   |
+| `HasContent()`         | not null, not empty, not whitespace only |
+| `NullIfEmpty()`        | Returns null if empty                    |
+| `NullIfWhiteSpace()`   | Returns null if whitespace               |
+
+### Truncation
+
+| Method                                      | Description                |
+| ------------------------------------------- | -------------------------- |
+| `Truncate(maxLength)`                       | Cut to max length          |
+| `TruncateWithEllipsis(maxLength, ellipsis)` | Cut with ellipsis appended |
+
+<Tip>
+  All methods are null-safe - they return `false` or `null` when the input
+  string is null instead of throwing.
+</Tip>

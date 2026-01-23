@@ -1,0 +1,259 @@
+---
+title: Try Extensions
+description: Try-pattern alternatives for dictionaries, parsing, and collection access
+icon: 'question'
+---
+
+Extension methods providing null-returning alternatives to `TryGetValue` and `TryParse` patterns.
+
+## The Problem
+
+Standard try-patterns require verbose out parameters:
+
+```csharp
+// BAD: Verbose
+if (dict.TryGetValue(key, out var value))
+{
+    DoSomething(value);
+}
+
+if (int.TryParse(input, out var number))
+{
+    Process(number);
+}
+```
+
+## The Solution
+
+```csharp
+// GOOD: Clean with null-conditional
+dict.GetOrNull(key)?.DoSomething();
+
+int? number = input.TryParseInt32();
+```
+
+## Dictionary Extensions
+
+### Reference Types
+
+```csharp
+// Returns value or null if not found
+TValue? result = dict.GetOrNull(key);
+
+// Works with null-conditional
+dict.GetOrNull(key)?.Process();
+
+// Chain with null-coalescing
+var value = dict.GetOrNull(key) ?? defaultValue;
+```
+
+### Value Types
+
+```csharp
+// Returns nullable for value types
+int? count = counts.GetValueOrNull("key");
+
+// Use with null-coalescing
+int actual = counts.GetValueOrNull("key") ?? 0;
+```
+
+### With Default Values
+
+```csharp
+// Explicit default value
+var timeout = settings.GetOrDefault("Timeout", 30);
+var name = users.GetOrDefault(userId, "Unknown");
+
+// Lazy default (only computed if needed)
+var config = cache.GetOrElse(key, () => LoadExpensiveConfig());
+```
+
+## Parsing Extensions
+
+All parsing methods return `null` on failure instead of using out parameters.
+
+### Integer Parsing
+
+```csharp
+// Nullable returns
+byte? b = "255".TryParseByte();
+sbyte? sb = "-128".TryParseSByte();
+short? s = "32767".TryParseInt16();
+ushort? us = "65535".TryParseUInt16();
+int? i = "42".TryParseInt32();
+uint? ui = "42".TryParseUInt32();
+long? l = "9223372036854775807".TryParseInt64();
+ulong? ul = "18446744073709551615".TryParseUInt64();
+
+// With default value
+int page = queryString["page"].TryParseInt32(1);
+```
+
+### Floating-Point Parsing
+
+```csharp
+float? f = "3.14".TryParseSingle();
+double? d = "3.14159".TryParseDouble();
+decimal? m = "99.99".TryParseDecimal();
+
+// With default
+double rate = input.TryParseDouble(0.0);
+```
+
+### Boolean Parsing
+
+```csharp
+bool? enabled = "true".TryParseBool();
+bool isEnabled = config["Enabled"].TryParseBool(false);
+```
+
+### Character Parsing
+
+```csharp
+char? c = "A".TryParseChar();  // 'A'
+char? invalid = "AB".TryParseChar();  // null (must be single char)
+```
+
+### GUID Parsing
+
+```csharp
+Guid? id = "550e8400-e29b-41d4-a716-446655440000".TryParseGuid();
+Guid defaultId = input.TryParseGuid(Guid.Empty);
+```
+
+### Enum Parsing
+
+```csharp
+// Case-sensitive (default)
+LogLevel? level = "Warning".TryParseEnum<LogLevel>();
+
+// Case-insensitive
+LogLevel? level = "warning".TryParseEnum<LogLevel>(ignoreCase: true);
+
+// With default
+var status = statusString.TryParseEnum(OrderStatus.Pending);
+```
+
+### Date/Time Parsing
+
+```csharp
+DateTime? date = "2024-01-15".TryParseDateTime();
+DateTimeOffset? dto = "2024-01-15T10:30:00Z".TryParseDateTimeOffset();
+TimeSpan? duration = "01:30:00".TryParseTimeSpan();
+
+// With defaults
+var deadline = input.TryParseDateTime(DateTime.MaxValue);
+```
+
+## Collection Access
+
+Safe index-based access without `IndexOutOfRangeException`:
+
+### Reference Types
+
+```csharp
+// Returns null if index out of bounds
+var first = items.ElementAtOrNull(0);
+var last = items.ElementAtOrNull(items.Count - 1);
+var invalid = items.ElementAtOrNull(999);  // null
+```
+
+### Value Types
+
+```csharp
+// Returns nullable for value types
+int? value = numbers.ValueAtOrNull(0);
+```
+
+### With Default Value
+
+```csharp
+var item = items.ElementAtOrDefault(index, fallbackItem);
+```
+
+## Examples
+
+### Configuration Parsing
+
+```csharp
+public class AppConfig
+{
+    public int Port { get; }
+    public bool EnableSsl { get; }
+    public TimeSpan Timeout { get; }
+
+    public AppConfig(IReadOnlyDictionary<string, string> settings)
+    {
+        Port = settings.GetOrNull("Port")?.TryParseInt32(8080) ?? 8080;
+        EnableSsl = settings.GetOrNull("EnableSsl")?.TryParseBool(false) ?? false;
+        Timeout = settings.GetOrNull("Timeout")?.TryParseTimeSpan(TimeSpan.FromSeconds(30))
+                  ?? TimeSpan.FromSeconds(30);
+    }
+}
+```
+
+### Query String Parsing
+
+```csharp
+public record PaginationParams(int Page, int PageSize, string? SortBy);
+
+public PaginationParams ParsePagination(IQueryCollection query)
+{
+    return new PaginationParams(
+        Page: query["page"].ToString().TryParseInt32(1),
+        PageSize: query["size"].ToString().TryParseInt32(20),
+        SortBy: query["sort"].ToString().NullIfEmpty()
+    );
+}
+```
+
+### Safe Array Access
+
+```csharp
+// Get command-line arguments safely
+var inputFile = args.ElementAtOrNull(0) ?? "input.txt";
+var outputFile = args.ElementAtOrNull(1) ?? "output.txt";
+var verbose = args.ElementAtOrNull(2)?.TryParseBool() ?? false;
+```
+
+## API Reference
+
+### Dictionary Methods
+
+| Method                                     | Description                             |
+| ------------------------------------------ | --------------------------------------- |
+| `GetOrNull<TKey, TValue>(key)`             | Returns value or null (reference types) |
+| `GetValueOrNull<TKey, TValue>(key)`        | Returns value or null (value types)     |
+| `GetOrDefault<TKey, TValue>(key, default)` | Returns value or specified default      |
+| `GetOrElse<TKey, TValue>(key, factory)`    | Returns value or factory result         |
+
+### Parsing Methods
+
+| Method                   | Input  | Output          |
+| ------------------------ | ------ | --------------- |
+| `TryParseByte`           | string | byte?           |
+| `TryParseSByte`          | string | sbyte?          |
+| `TryParseInt16`          | string | short?          |
+| `TryParseUInt16`         | string | ushort?         |
+| `TryParseInt32`          | string | int?            |
+| `TryParseUInt32`         | string | uint?           |
+| `TryParseInt64`          | string | long?           |
+| `TryParseUInt64`         | string | ulong?          |
+| `TryParseSingle`         | string | float?          |
+| `TryParseDouble`         | string | double?         |
+| `TryParseDecimal`        | string | decimal?        |
+| `TryParseBool`           | string | bool?           |
+| `TryParseChar`           | string | char?           |
+| `TryParseGuid`           | string | Guid?           |
+| `TryParseEnum<T>`        | string | T?              |
+| `TryParseDateTime`       | string | DateTime?       |
+| `TryParseDateTimeOffset` | string | DateTimeOffset? |
+| `TryParseTimeSpan`       | string | TimeSpan?       |
+
+### Collection Methods
+
+| Method                                  | Description                               |
+| --------------------------------------- | ----------------------------------------- |
+| `ElementAtOrNull<T>(index)`             | Returns element or null (reference types) |
+| `ValueAtOrNull<T>(index)`               | Returns element or null (value types)     |
+| `ElementAtOrDefault<T>(index, default)` | Returns element or specified default      |

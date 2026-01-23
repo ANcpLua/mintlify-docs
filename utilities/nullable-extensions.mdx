@@ -1,0 +1,294 @@
+---
+title: Nullable Extensions
+description: Fluent functional-style null handling for reference and value types
+icon: 'circle-half-stroke'
+---
+
+Extension methods providing a functional approach to null handling, inspired by Option/Maybe types.
+
+## Overview
+
+Instead of nested null checks, use fluent transformations:
+
+```csharp
+// BAD: Nested null checks
+string? city = null;
+if (order != null)
+{
+    var customer = order.Customer;
+    if (customer != null)
+    {
+        var address = customer.Address;
+        if (address != null)
+        {
+            city = address.City;
+        }
+    }
+}
+
+// GOOD: Fluent chain
+var city = order
+    .SelectMany(o => o.Customer)
+    .SelectMany(c => c.Address)
+    .Select(a => a.City);
+```
+
+## Transformation
+
+### Select
+
+Transform a nullable value:
+
+```csharp
+// Reference types
+int? length = nullableString.Select(s => s.Length);
+
+// Chain transformations
+var result = user.Select(u => u.Address).Select(a => a.City);
+
+// Value types
+string? countStr = count.Select(c => c.ToString());
+```
+
+### SelectMany
+
+Transform with a selector that also returns nullable (flattens the result):
+
+```csharp
+// Navigate nested nullable properties
+var city = order
+    .SelectMany(o => o.Customer)    // Customer?
+    .SelectMany(c => c.Address)     // Address?
+    .Select(a => a.City);           // string?
+```
+
+## Filtering
+
+### Where
+
+Keep the value only if it satisfies a predicate:
+
+```csharp
+// Only keep non-empty strings
+var nonEmpty = str.Where(s => s.Length > 0);
+
+// Filter based on conditions
+var validUser = user.Where(u => u.IsActive && u.EmailVerified);
+
+// Value types
+int? positiveOnly = number.Where(n => n > 0);
+```
+
+## Side Effects
+
+### Do
+
+Execute an action if not null, then continue the chain:
+
+```csharp
+// Log and continue processing
+var result = item
+    .Do(i => logger.Log(i.Name))
+    .Select(i => Process(i));
+
+// Conditional side effects
+user.Do(u => NotifyUser(u));
+```
+
+## Default Values
+
+### Or
+
+Return the value or a default:
+
+```csharp
+// Reference types
+var name = user.Select(u => u.Name).Or("Guest");
+
+// Value types
+int count = nullableCount.Or(0);
+```
+
+### OrElse
+
+Return the value or compute a default lazily:
+
+```csharp
+// Only computes default if value is null
+var config = cachedConfig.OrElse(() => LoadConfigFromDisk());
+```
+
+### OrThrow
+
+Return the value or throw an exception:
+
+```csharp
+var user = GetUser(id).OrThrow(() => new NotFoundException($"User {id} not found"));
+```
+
+## Pattern Matching
+
+### Match
+
+Handle both cases explicitly:
+
+```csharp
+var message = user.Match(
+    some: u => $"Welcome, {u.Name}!",
+    none: () => "Please log in"
+);
+
+// Value types
+var display = count.Match(
+    some: c => $"Count: {c}",
+    none: () => "No count available"
+);
+```
+
+## Collection Conversion
+
+### ToEnumerable
+
+Convert a nullable to a single-element or empty sequence:
+
+```csharp
+// Combine multiple nullable values
+var items = value1.ToEnumerable()
+    .Concat(value2.ToEnumerable())
+    .Concat(value3.ToEnumerable());
+
+// Use with LINQ
+var total = orders
+    .Select(o => o.Discount)
+    .SelectMany(d => d.ToEnumerable())
+    .Sum();
+```
+
+## Utility Methods
+
+### HasValue
+
+Check if a reference type is not null:
+
+```csharp
+bool hasUser = user.HasValue();  // true if not null
+```
+
+### NullIf
+
+Convert sentinel values to null:
+
+```csharp
+// Convert -1 to null
+int? index = GetIndex().NullIfValue(-1);
+
+// Convert empty string to null
+string? name = GetName().NullIf("");
+
+// Works with any comparable value
+var result = value.NullIf(sentinel);
+```
+
+## Examples
+
+### Safe Navigation
+
+```csharp
+public string GetOrderSummary(Order? order)
+{
+    return order
+        .Select(o => o.Items)
+        .Where(items => items.Count > 0)
+        .Select(items => $"Order with {items.Count} items")
+        .Or("No order");
+}
+```
+
+### Configuration with Defaults
+
+```csharp
+public AppSettings LoadSettings(IConfiguration? config)
+{
+    return new AppSettings
+    {
+        Port = config
+            .Select(c => c["Port"])
+            .Select(p => int.TryParse(p, out var v) ? v : (int?)null)
+            .Or(8080),
+
+        Host = config
+            .Select(c => c["Host"])
+            .Where(h => !string.IsNullOrEmpty(h))
+            .Or("localhost")
+    };
+}
+```
+
+### Validation Pipeline
+
+```csharp
+public Result<User> ValidateUser(User? user)
+{
+    return user
+        .Where(u => !string.IsNullOrEmpty(u.Email))
+        .Do(u => logger.LogDebug($"Validating {u.Email}"))
+        .Where(u => u.Age >= 18)
+        .Match(
+            some: u => Result.Success(u),
+            none: () => Result.Failure<User>("Invalid user")
+        );
+}
+```
+
+### Combining with LINQ
+
+```csharp
+var validEmails = users
+    .Select(u => u.Email.NullIf(""))  // Empty strings become null
+    .Where(e => e.HasValue())         // Filter out nulls
+    .Select(e => e!);                 // Unwrap (safe after Where)
+```
+
+## API Reference
+
+### Transformation
+
+| Method                             | Description                                 |
+| ---------------------------------- | ------------------------------------------- |
+| `Select<T, TResult>(selector)`     | Transform value if not null                 |
+| `SelectMany<T, TResult>(selector)` | Transform with nullable selector (flattens) |
+
+### Filtering
+
+| Method                | Description                          |
+| --------------------- | ------------------------------------ |
+| `Where<T>(predicate)` | Keep value only if predicate is true |
+
+### Side Effects
+
+| Method          | Description                                 |
+| --------------- | ------------------------------------------- |
+| `Do<T>(action)` | Execute action if not null, return original |
+
+### Default Values
+
+| Method                         | Description                    |
+| ------------------------------ | ------------------------------ |
+| `Or<T>(default)`               | Return value or default        |
+| `OrElse<T>(factory)`           | Return value or factory result |
+| `OrThrow<T>(exceptionFactory)` | Return value or throw          |
+
+### Pattern Matching
+
+| Method                          | Description                                 |
+| ------------------------------- | ------------------------------------------- |
+| `Match<T, TResult>(some, none)` | Handle both cases                           |
+| `ToEnumerable<T>()`             | Convert to single-element or empty sequence |
+
+### Utilities
+
+| Method                     | Description                                       |
+| -------------------------- | ------------------------------------------------- |
+| `HasValue<T>()`            | Returns true if not null (reference types)        |
+| `NullIf<T>(sentinel)`      | Returns null if equals sentinel (reference types) |
+| `NullIfValue<T>(sentinel)` | Returns null if equals sentinel (value types)     |

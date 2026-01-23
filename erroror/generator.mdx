@@ -1,0 +1,198 @@
+---
+title: Endpoint Generator
+description: Source generator for ASP.NET Core Minimal API integration
+icon: 'wand-magic-sparkles'
+---
+
+The `ErrorOrX.Generators` package provides a Roslyn source generator that converts `ErrorOr<T>` handlers into ASP.NET Core Minimal API endpoints.
+
+## What Gets Generated
+
+```csharp
+// You write:
+[Get("/todos/{id}")]
+public static ErrorOr<Todo> GetById(int id) => _db.Find(id) ?? Error.NotFound();
+
+// Generator produces:
+app.MapGet("/todos/{id}", Invoke_Ep1)
+    .WithName("MyApp_TodoEndpoints_GetById");
+
+private static async Task Invoke_Ep1(HttpContext ctx)
+{
+    var __result = await Invoke_Ep1_Core(ctx);
+    await __result.ExecuteAsync(ctx);
+}
+
+private static Task<IResult> Invoke_Ep1_Core(HttpContext ctx)
+{
+    int id = (int)ctx.Request.RouteValues["id"]!;
+    var result = TodoEndpoints.GetById(id);
+    if (result.IsError) return Task.FromResult(ToProblem(result.Errors));
+    return Task.FromResult(TypedResults.Ok(result.Value));
+}
+```
+
+## Route Attributes
+
+| Attribute           | HTTP Method |
+| ------------------- | ----------- |
+| `[Get("/path")]`    | GET         |
+| `[Post("/path")]`   | POST        |
+| `[Put("/path")]`    | PUT         |
+| `[Patch("/path")]`  | PATCH       |
+| `[Delete("/path")]` | DELETE      |
+
+## Parameter Binding
+
+The generator infers parameter sources based on HTTP method and type.
+
+### Binding Priority
+
+| Priority | Condition                                                 | Binding          |
+| -------- | --------------------------------------------------------- | ---------------- |
+| 1        | Explicit attribute (`[FromBody]`, `[FromServices]`, etc.) | As specified     |
+| 2        | Special types (`HttpContext`, `CancellationToken`)        | Auto-detected    |
+| 3        | Parameter name matches route `{param}`                    | Route            |
+| 4        | Primitive type not in route                               | Query            |
+| 5        | Interface type                                            | Service          |
+| 6        | Abstract type                                             | Service          |
+| 7        | Service naming pattern                                    | Service          |
+| 8        | POST/PUT/PATCH + complex type                             | **Body**         |
+| 9        | GET/DELETE + complex type                                 | **Error EOE025** |
+| 10       | Fallback                                                  | Service          |
+
+### Service Type Detection
+
+These patterns are detected as service types:
+
+```csharp
+ITodoService      // Interface with Service suffix
+IUserRepository   // Interface with Repository suffix
+TodoHandler       // *Handler
+TodoManager       // *Manager
+ConfigProvider    // *Provider
+TodoFactory       // *Factory
+HttpClient        // *Client
+AppDbContext      // *Context with Db
+```
+
+### Complex Type on GET/DELETE
+
+Complex types on GET/DELETE require explicit binding:
+
+```csharp
+// ⚠️ EOE025: Ambiguous parameter binding
+[Get("/todos")]
+public static ErrorOr<List<Todo>> Search(SearchFilter filter) => ...
+
+// ✅ Explicit query binding
+[Get("/todos")]
+public static ErrorOr<List<Todo>> Search([FromQuery] SearchFilter filter) => ...
+
+// ✅ Or use AsParameters
+[Get("/todos")]
+public static ErrorOr<List<Todo>> Search([AsParameters] SearchFilter filter) => ...
+```
+
+## Middleware Attributes
+
+The generator emits middleware fluent calls since the wrapper delegate loses original method attributes:
+
+| Attribute                        | Generated Call                    |
+| -------------------------------- | --------------------------------- |
+| `[Authorize]`                    | `.RequireAuthorization()`         |
+| `[Authorize("Policy")]`          | `.RequireAuthorization("Policy")` |
+| `[EnableRateLimiting("Policy")]` | `.RequireRateLimiting("Policy")`  |
+| `[OutputCache]`                  | `.CacheOutput()`                  |
+| `[EnableCors("Policy")]`         | `.RequireCors("Policy")`          |
+
+## JSON Context Generation
+
+### Default Behavior
+
+When `ErrorOrGenerateJsonContext` is `true` (default):
+
+```csharp
+// Generated ErrorOrJsonContext.g.cs
+[JsonSourceGenerationOptions(
+    PropertyNamingPolicy = JsonKnownNamingPolicy.CamelCase,
+    DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull)]
+[JsonSerializable(typeof(Todo))]
+[JsonSerializable(typeof(ProblemDetails))]
+[JsonSerializable(typeof(HttpValidationProblemDetails))]
+internal partial class ErrorOrJsonContext : JsonSerializerContext { }
+```
+
+### With Custom Context
+
+Disable generation and use your own:
+
+```xml
+<PropertyGroup>
+  <ErrorOrGenerateJsonContext>false</ErrorOrGenerateJsonContext>
+</PropertyGroup>
+```
+
+The generator emits a helper file with copy-paste attributes:
+
+```csharp
+// ErrorOrJsonContext.MissingTypes.g.cs
+// Add these to your JsonSerializerContext:
+// [JsonSerializable(typeof(Microsoft.AspNetCore.Mvc.ProblemDetails))]
+// [JsonSerializable(typeof(Microsoft.AspNetCore.Http.HttpValidationProblemDetails))]
+```
+
+## MSBuild Properties
+
+| Property                     | Default | Purpose                             |
+| ---------------------------- | ------- | ----------------------------------- |
+| `ErrorOrGenerateJsonContext` | `true`  | Generate JSON serialization context |
+
+## AOT Compatibility
+
+The generator produces AOT-compatible code:
+
+1. **No `(Delegate)` cast** - Uses typed `MapGet`/`MapPost`
+2. **Wrapper pattern** - Returns `Task`, not `Task<Results<...>>`
+3. **Explicit `ExecuteAsync`** - Handles response serialization
+
+```csharp
+// Wrapper: matches RequestDelegate (HttpContext → Task)
+private static async Task Invoke_Ep1(HttpContext ctx)
+{
+    var __result = await Invoke_Ep1_Core(ctx);
+    await __result.ExecuteAsync(ctx);  // Writes response
+}
+
+// Core: typed for OpenAPI documentation
+private static Task<IResult> Invoke_Ep1_Core(HttpContext ctx)
+{
+    // Handler logic
+}
+```
+
+## API Versioning
+
+Supports `Asp.Versioning.Http`:
+
+```csharp
+[ApiVersion("1.0")]
+[ApiVersion("2.0")]
+public static class TodoEndpoints
+{
+    [Get("/todos")]
+    public static ErrorOr<List<Todo>> GetAll() => ...
+
+    [MapToApiVersion("2.0")]
+    [Get("/todos/{id}")]
+    public static ErrorOr<Todo> GetByIdV2(int id) => ...
+}
+
+// Version-neutral
+[ApiVersionNeutral]
+public static class HealthEndpoints
+{
+    [Get("/health")]
+    public static ErrorOr<HealthStatus> Check() => ...
+}
+```

@@ -1,0 +1,171 @@
+---
+title: Attribute Extensions
+description: Extract values from Roslyn AttributeData with clean, type-safe APIs
+icon: 'tag'
+---
+
+Extension methods for extracting constructor arguments and named arguments from `AttributeData`.
+
+## The Problem
+
+Extracting attribute values requires verbose loops and null checks:
+
+```csharp
+// BAD: Verbose and error-prone
+string? displayName = null;
+foreach (var attr in symbol.GetAttributes())
+{
+    if (attr.AttributeClass?.ToDisplayString() == "System.ComponentModel.DataAnnotations.DisplayAttribute")
+    {
+        foreach (var namedArg in attr.NamedArguments)
+        {
+            if (namedArg.Key == "Name" && namedArg.Value.Value is string name)
+            {
+                displayName = name;
+                break;
+            }
+        }
+    }
+}
+```
+
+## The Solution
+
+```csharp
+// GOOD: Clean and type-safe
+var displayName = symbol.GetAttributeNamedArgument<string>(
+    "System.ComponentModel.DataAnnotations.DisplayAttribute", "Name");
+```
+
+## Constructor Arguments
+
+Extract positional arguments from attribute constructors:
+
+```csharp
+// [JsonDerivedType(typeof(DerivedClass), "discriminator")]
+var derivedType = attribute.GetConstructorArgument<INamedTypeSymbol>(0);
+var discriminator = attribute.GetConstructorArgument<string>(1);
+
+// Try-pattern for conditional extraction
+if (attribute.TryGetConstructorArgument<int>(0, out var index))
+{
+    // Use index
+}
+
+// Get argument count
+int count = attribute.GetConstructorArgumentCount();
+```
+
+## Named Arguments
+
+Extract named property/field arguments:
+
+```csharp
+// [Display(Name = "User Name", Order = 1)]
+var displayName = attribute.GetNamedArgument<string>("Name");
+var order = attribute.GetNamedArgument<int>("Order");
+
+// Try-pattern
+if (attribute.TryGetNamedArgument<bool>("IsRequired", out var isRequired) && isRequired)
+{
+    // Handle required field
+}
+
+// Check existence
+if (attribute.HasNamedArgument("Name"))
+{
+    // Name was explicitly set
+}
+
+// Get all argument names
+foreach (var name in attribute.GetNamedArgumentNames())
+{
+    Console.WriteLine(name);
+}
+```
+
+## Symbol Convenience Methods
+
+Get attribute values directly from symbols:
+
+```csharp
+// Constructor argument from symbol
+var derivedType = type.GetAttributeConstructorArgument<INamedTypeSymbol>(
+    "System.Text.Json.Serialization.JsonDerivedTypeAttribute", 0);
+
+// Named argument from symbol
+var displayName = property.GetAttributeNamedArgument<string>(
+    "System.ComponentModel.DataAnnotations.DisplayAttribute", "Name") ?? property.Name;
+
+// Using type symbol instead of string
+var attrType = compilation.GetTypeByMetadataName("MyNamespace.MyAttribute");
+var value = symbol.GetAttributeNamedArgument<string>(attrType, "PropertyName");
+
+// Try-pattern from symbol
+if (symbol.TryGetAttributeConstructorArgument<int>("MyAttribute", 0, out var priority))
+{
+    // Use priority
+}
+```
+
+## Array Arguments
+
+Extract array-typed arguments:
+
+```csharp
+// [MyAttribute(new[] { "a", "b", "c" })]
+ImmutableArray<string> values = attribute.GetConstructorArgumentArray<string>(0);
+
+// [MyAttribute(Roles = new[] { Role.Admin, Role.User })]
+ImmutableArray<int> roles = attribute.GetNamedArgumentArray<int>("Roles");
+```
+
+## Common Patterns
+
+### Get Display Name
+
+```csharp
+// Returns DisplayAttribute.Name or falls back to symbol name
+var displayName = property.GetDisplayName();
+
+// With pre-resolved type symbol (better performance in loops)
+var displayAttr = compilation.GetTypeByMetadataName(
+    "System.ComponentModel.DataAnnotations.DisplayAttribute");
+var displayName = property.GetDisplayName(displayAttr);
+```
+
+### Get JSON Derived Types
+
+```csharp
+// Extract all types from [JsonDerivedType] attributes
+var jsonDerivedType = compilation.GetTypeByMetadataName(
+    "System.Text.Json.Serialization.JsonDerivedTypeAttribute");
+
+ImmutableArray<INamedTypeSymbol>? derivedTypes = baseType.GetJsonDerivedTypes(jsonDerivedType);
+
+if (derivedTypes.HasValue)
+{
+    foreach (var derivedType in derivedTypes.Value)
+    {
+        // Process each derived type
+    }
+}
+```
+
+## API Reference
+
+| Method                                                        | Description                                  |
+| ------------------------------------------------------------- | -------------------------------------------- |
+| `GetConstructorArgument<T>(index)`                            | Gets constructor argument at index           |
+| `TryGetConstructorArgument<T>(index, out value)`              | Try-pattern for constructor argument         |
+| `GetConstructorArgumentCount()`                               | Returns number of constructor arguments      |
+| `GetNamedArgument<T>(name)`                                   | Gets named argument by name                  |
+| `TryGetNamedArgument<T>(name, out value)`                     | Try-pattern for named argument               |
+| `HasNamedArgument(name)`                                      | Checks if named argument exists              |
+| `GetNamedArgumentNames()`                                     | Enumerates all named argument names          |
+| `GetConstructorArgumentArray<T>(index)`                       | Gets array constructor argument              |
+| `GetNamedArgumentArray<T>(name)`                              | Gets array named argument                    |
+| `GetAttributeConstructorArgument<T>(symbol, attrName, index)` | Gets constructor arg from symbol's attribute |
+| `GetAttributeNamedArgument<T>(symbol, attrName, argName)`     | Gets named arg from symbol's attribute       |
+| `GetDisplayName(symbol)`                                      | Gets DisplayAttribute.Name or symbol name    |
+| `GetJsonDerivedTypes(type, attrType)`                         | Gets all JsonDerivedType type arguments      |

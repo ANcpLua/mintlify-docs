@@ -1,0 +1,153 @@
+---
+title: HTTP Status Mapping
+description: ErrorType to HTTP status code and TypedResults mapping
+icon: 'arrows-left-right'
+---
+
+The generator maps `ErrorType` enum values to HTTP status codes and BCL `TypedResults` types following RFC 9110 semantics.
+
+## ErrorType → HTTP Mapping
+
+| ErrorType      | HTTP | Title                 | TypedResults Factory           | Return Type                           |
+| -------------- | ---- | --------------------- | ------------------------------ | ------------------------------------- |
+| `Validation`   | 400  | Bad Request           | `ValidationProblem(errors)`    | `ValidationProblem`                   |
+| `Unauthorized` | 401  | Unauthorized          | `Unauthorized()`               | `UnauthorizedHttpResult`              |
+| `Forbidden`    | 403  | Forbidden             | `Forbid()`                     | `ForbidHttpResult`                    |
+| `NotFound`     | 404  | Not Found             | `NotFound(problem)`            | `NotFound<ProblemDetails>`            |
+| `Conflict`     | 409  | Conflict              | `Conflict(problem)`            | `Conflict<ProblemDetails>`            |
+| `Failure`      | 500  | Internal Server Error | `InternalServerError(problem)` | `InternalServerError<ProblemDetails>` |
+| `Unexpected`   | 500  | Internal Server Error | `InternalServerError(problem)` | `InternalServerError<ProblemDetails>` |
+
+<Warning>
+  `Failure` and `Unexpected` both map to **500**, not 422. These are server
+  errors per RFC 9110. For 422, use `Error.Custom(422, ...)`.
+</Warning>
+
+## Success Type → HTTP Mapping
+
+| ErrorOr Type            | HTTP | TypedResults | Use Case                  |
+| ----------------------- | ---- | ------------ | ------------------------- |
+| `ErrorOr<T>` (value)    | 200  | `Ok<T>`      | GET, PUT returning entity |
+| `ErrorOr<Success>`      | 200  | `Ok`         | Generic success           |
+| `ErrorOr<Created>`      | 201  | `Created`    | POST without body         |
+| `ErrorOr<T>` + `[Post]` | 201  | `Created<T>` | POST returning entity     |
+| `ErrorOr<Updated>`      | 200  | `Ok`         | PUT/PATCH success         |
+| `ErrorOr<Deleted>`      | 204  | `NoContent`  | DELETE success            |
+
+## Custom Error Codes
+
+Use `Error.Custom()` for status codes not covered by `ErrorType`:
+
+```csharp
+// Direct mapping to specific TypedResult
+Error.Custom(400, "Code", "Description")  // BadRequest<ProblemDetails>
+Error.Custom(422, "Code", "Description")  // UnprocessableEntity<ProblemDetails>
+Error.Custom(429, "Code", "Description")  // ProblemHttpResult (429)
+Error.Custom(503, "Code", "Description")  // ProblemHttpResult (503)
+```
+
+### Custom Error Resolution
+
+| NumericType   | TypedResults Factory           |
+| ------------- | ------------------------------ |
+| 400           | `BadRequest(problem)`          |
+| 401           | `Unauthorized()`               |
+| 403           | `Forbid()`                     |
+| 404           | `NotFound(problem)`            |
+| 409           | `Conflict(problem)`            |
+| 422           | `UnprocessableEntity(problem)` |
+| 500           | `InternalServerError(problem)` |
+| Other 4xx/5xx | `Problem(statusCode: code)`    |
+
+## ProblemDetails (RFC 7807)
+
+All error responses use RFC 7807 ProblemDetails format:
+
+```json
+{
+  "type": "https://httpstatuses.io/404",
+  "title": "Not Found",
+  "status": 404,
+  "detail": "Todo with ID 123 was not found",
+  "code": "Todo.NotFound",
+  "traceId": "00-abc123..."
+}
+```
+
+### Validation Errors
+
+Multiple validation errors aggregate into `HttpValidationProblemDetails`:
+
+```csharp
+// Multiple validation errors
+return new[]
+{
+    Error.Validation("Name.Required", "Name is required"),
+    Error.Validation("Email.Invalid", "Email format is invalid")
+};
+```
+
+```json
+{
+  "type": "https://tools.ietf.org/html/rfc7231#section-6.5.1",
+  "title": "One or more validation errors occurred.",
+  "status": 400,
+  "errors": {
+    "Name.Required": ["Name is required"],
+    "Email.Invalid": ["Email format is invalid"]
+  }
+}
+```
+
+## Union Type Generation
+
+The generator creates `Results<...>` union types for OpenAPI documentation:
+
+```csharp
+// Handler
+[Get("/todos/{id}")]
+public static ErrorOr<Todo> GetById(int id) { ... }
+
+// Generated union (inferred from possible error types)
+Results<Ok<Todo>, NotFound<ProblemDetails>, InternalServerError<ProblemDetails>>
+```
+
+### BCL Limit
+
+The BCL provides `Results<T1, T2, ..., T6>` - maximum 6 type parameters.
+
+When more types are needed:
+
+1. **IResult fallback** - Loses compile-time safety
+2. **Consolidate errors** - Use `ProblemHttpResult` for multiple codes
+3. **Custom metadata** - Implement `IEndpointMetadataProvider`
+
+### Type Deduplication
+
+`Failure` and `Unexpected` both map to `InternalServerError<ProblemDetails>`, so only one appears in the union.
+
+### Type Ordering
+
+Types are ordered by status code (ascending):
+
+```csharp
+Results<
+    Ok<Todo>,                           // 200
+    Created<Todo>,                       // 201
+    NoContent,                           // 204
+    ValidationProblem,                   // 400
+    NotFound<ProblemDetails>,            // 404
+    Conflict<ProblemDetails>,            // 409
+    InternalServerError<ProblemDetails>  // 500
+>
+```
+
+## Security Considerations
+
+`401 Unauthorized` and `403 Forbidden` return no body to prevent information leakage:
+
+```csharp
+// Correct: No body
+ErrorType.Unauthorized => TypedResults.Unauthorized()
+ErrorType.Forbidden => TypedResults.Forbid()
+```

@@ -1,0 +1,145 @@
+---
+title: ErrorOrX Overview
+description: Discriminated unions for .NET with fluent error handling and ASP.NET Core integration
+icon: 'code-branch'
+---
+
+ErrorOrX provides discriminated union types for .NET with a fluent API for error handling and automatic ASP.NET Core Minimal API integration.
+
+## Packages
+
+| Package               | Purpose                                    |
+| --------------------- | ------------------------------------------ |
+| `ErrorOrX`            | Runtime library with `ErrorOr<T>` type     |
+| `ErrorOrX.Generators` | Source generator for Minimal API endpoints |
+
+## Installation
+
+```bash
+dotnet add package ErrorOrX.Generators
+```
+
+<Note>
+  `ErrorOrX.Generators` automatically includes `ErrorOrX` as a dependency.
+</Note>
+
+## Quick Start
+
+```csharp
+using ErrorOr;
+
+// Define an endpoint handler
+public static class TodoEndpoints
+{
+    [Get("/todos/{id}")]
+    public static ErrorOr<Todo> GetById(int id)
+    {
+        var todo = _db.Find(id);
+        if (todo is null)
+            return Error.NotFound("Todo.NotFound", $"Todo {id} not found");
+        return todo;
+    }
+}
+
+// Register in Program.cs
+app.MapErrorOrEndpoints();
+```
+
+The generator produces:
+
+- `MapErrorOrEndpoints()` extension method
+- Typed `Results<...>` union for OpenAPI
+- Automatic parameter binding
+- JSON serialization context (AOT-compatible)
+
+## Core Types
+
+### ErrorOr&lt;T&gt;
+
+A discriminated union that holds either a value of type `T` or one or more `Error` instances.
+
+```csharp
+ErrorOr<User> result = GetUser(id);
+
+// Check state
+if (result.IsError)
+{
+    // Handle errors
+    foreach (var error in result.Errors)
+        Console.WriteLine($"{error.Code}: {error.Description}");
+}
+else
+{
+    // Use value
+    var user = result.Value;
+}
+```
+
+### Fluent API
+
+| Method     | Purpose                     |
+| ---------- | --------------------------- |
+| `Then()`   | Chain operations on success |
+| `Else()`   | Provide fallback on error   |
+| `Match()`  | Transform to result         |
+| `Switch()` | Execute side effects        |
+| `FailIf()` | Conditional failure         |
+
+```csharp
+var result = GetUser(id)
+    .Then(user => GetOrders(user.Id))
+    .Then(orders => orders.Where(o => o.Status == "Active"))
+    .Else(errors => Array.Empty<Order>());
+```
+
+### Or Extensions
+
+Convert nullable values to `ErrorOr<T>`:
+
+```csharp
+// Returns Error.NotFound if null
+User? user = FindUser(id);
+ErrorOr<User> result = user.OrNotFound("User.NotFound", "User not found");
+
+// Other extensions
+value.OrValidation("Field.Invalid", "Invalid field");
+value.OrUnauthorized("Auth.Failed", "Authentication failed");
+value.OrForbidden("Access.Denied", "Access denied");
+value.OrConflict("Resource.Exists", "Resource already exists");
+value.OrFailure("Operation.Failed", "Operation failed");
+value.OrError(customError);
+```
+
+## Success Sentinels
+
+For endpoints that don't return a value:
+
+```csharp
+[Post("/todos")]
+public static ErrorOr<Created> Create(CreateTodoRequest req)
+{
+    _db.Add(new Todo(req.Title));
+    return Result.Created;
+}
+
+[Delete("/todos/{id}")]
+public static ErrorOr<Deleted> Delete(int id)
+{
+    _db.Remove(id);
+    return Result.Deleted;
+}
+
+[Put("/todos/{id}")]
+public static ErrorOr<Updated> Update(int id, UpdateTodoRequest req)
+{
+    _db.Update(id, req);
+    return Result.Updated;
+}
+```
+
+| Sentinel         | HTTP Status | TypedResult |
+| ---------------- | ----------- | ----------- |
+| `Result.Success` | 200         | `Ok`        |
+| `Result.Created` | 201         | `Created`   |
+| `Result.Updated` | 200         | `Ok`        |
+| `Result.Deleted` | 204         | `NoContent` |
