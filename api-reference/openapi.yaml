@@ -1,21 +1,7 @@
 openapi: 3.1.0
 info:
   title: QYL Observability API
-  description: REST API for the qyl observability platform. Query traces, logs, metrics, and manage deployments.
-  version: '2026-01-15'
-  contact:
-    name: ANcpLua
-    url: https://github.com/ANcpLua
-  license:
-    name: MIT
-    url: https://opensource.org/licenses/MIT
-servers:
-  - url: http://localhost:5100
-    description: Local Development
-  - url: https://api.qyl.dev
-    description: Production
-  - url: https://api.staging.qyl.dev
-    description: Staging
+  version: '2025-01-01'
 tags:
   - name: Streaming
   - name: Traces
@@ -31,8 +17,7 @@ tags:
 paths:
   /health:
     get:
-      operationId: HealthApi_check
-      summary: Health Check
+      operationId: health_check
       description: Health check endpoint
       parameters: []
       responses:
@@ -46,8 +31,7 @@ paths:
         - Health
   /health/live:
     get:
-      operationId: HealthApi_live
-      summary: Liveness Probe
+      operationId: health_liveness
       description: Liveness probe
       parameters: []
       responses:
@@ -59,8 +43,7 @@ paths:
         - Health
   /health/ready:
     get:
-      operationId: HealthApi_ready
-      summary: Readiness Probe
+      operationId: health_readiness
       description: Readiness probe
       parameters: []
       responses:
@@ -73,7 +56,6 @@ paths:
   /v1/deployments:
     get:
       operationId: DeploymentsApi_list
-      summary: List Deployments
       description: List deployments
       parameters:
         - name: serviceName
@@ -195,7 +177,6 @@ paths:
         - Deployments
     post:
       operationId: DeploymentsApi_create
-      summary: Create Deployment
       description: Record new deployment
       parameters: []
       responses:
@@ -250,7 +231,6 @@ paths:
   /v1/deployments/metrics/dora:
     get:
       operationId: DeploymentsApi_getDoraMetrics
-      summary: DORA Metrics
       description: Get DORA metrics
       parameters:
         - name: serviceName
@@ -312,7 +292,6 @@ paths:
   /v1/deployments/{deploymentId}:
     get:
       operationId: DeploymentsApi_get
-      summary: Get Deployment
       description: Get deployment by ID
       parameters:
         - name: deploymentId
@@ -365,7 +344,6 @@ paths:
         - Deployments
     patch:
       operationId: DeploymentsApi_update
-      summary: Update Deployment
       description: Update deployment status
       parameters:
         - name: deploymentId
@@ -442,7 +420,6 @@ paths:
   /v1/errors:
     get:
       operationId: ErrorsApi_list
-      summary: List Errors
       description: List error groups
       parameters:
         - name: serviceName
@@ -565,7 +542,6 @@ paths:
   /v1/errors/stats:
     get:
       operationId: ErrorsApi_getStats
-      summary: Error Statistics
       description: Get error statistics
       parameters:
         - name: serviceName
@@ -620,7 +596,6 @@ paths:
   /v1/errors/{errorId}:
     get:
       operationId: ErrorsApi_get
-      summary: Get Error
       description: Get error by ID
       parameters:
         - name: errorId
@@ -673,7 +648,6 @@ paths:
         - Errors
     patch:
       operationId: ErrorsApi_update
-      summary: Update Error
       description: Update error status
       parameters:
         - name: errorId
@@ -750,7 +724,6 @@ paths:
   /v1/errors/{errorId}/correlations:
     get:
       operationId: ErrorsApi_getCorrelations
-      summary: Error Correlations
       description: Get error correlations
       parameters:
         - name: errorId
@@ -804,7 +777,6 @@ paths:
   /v1/exceptions:
     get:
       operationId: ExceptionsApi_list
-      summary: List Exceptions
       description: List exceptions
       parameters:
         - name: serviceName
@@ -927,7 +899,6 @@ paths:
   /v1/exceptions/stats:
     get:
       operationId: ExceptionsApi_getStats
-      summary: Exception Statistics
       description: Get exception statistics
       parameters:
         - name: serviceName
@@ -982,7 +953,6 @@ paths:
   /v1/logs:
     get:
       operationId: LogsApi_list
-      summary: List Logs
       description: Query logs with filtering and pagination
       parameters:
         - name: serviceName
@@ -1126,7 +1096,6 @@ paths:
   /v1/logs/aggregate:
     post:
       operationId: LogsApi_aggregate
-      summary: Aggregate Logs
       description: Aggregate logs
       parameters: []
       responses:
@@ -1181,7 +1150,6 @@ paths:
   /v1/logs/patterns:
     get:
       operationId: LogsApi_getPatterns
-      summary: Log Patterns
       description: Get log patterns
       parameters:
         - name: serviceName
@@ -1246,7 +1214,6 @@ paths:
   /v1/logs/search:
     post:
       operationId: LogsApi_search
-      summary: Search Logs
       description: Search logs with complex query
       parameters: []
       responses:
@@ -1320,7 +1287,6 @@ paths:
   /v1/logs/stats:
     get:
       operationId: LogsApi_getStats
-      summary: Log Statistics
       description: Get log statistics
       parameters:
         - name: serviceName
@@ -1375,7 +1341,6 @@ paths:
   /v1/metrics:
     get:
       operationId: MetricsApi_list
-      summary: List Metrics
       description: List available metrics
       parameters:
         - name: serviceName
@@ -1458,7 +1423,6 @@ paths:
   /v1/metrics/query:
     post:
       operationId: MetricsApi_query
-      summary: Query Metrics
       description: Query metric data points
       parameters: []
       responses:
@@ -1513,7 +1477,6 @@ paths:
   /v1/metrics/{metricName}:
     get:
       operationId: MetricsApi_getMetadata
-      summary: Metric Metadata
       description: Get metric metadata
       parameters:
         - name: metricName
@@ -1567,7 +1530,6 @@ paths:
   /v1/pipelines:
     get:
       operationId: PipelinesApi_list
-      summary: List Pipelines
       description: List pipeline runs
       parameters:
         - name: pipelineName
@@ -1690,7 +1652,6 @@ paths:
   /v1/pipelines/stats:
     get:
       operationId: PipelinesApi_getStats
-      summary: Pipeline Statistics
       description: Get pipeline statistics
       parameters:
         - name: pipelineName
@@ -1745,7 +1706,6 @@ paths:
   /v1/services:
     get:
       operationId: ServicesApi_list
-      summary: List Services
       description: List discovered services
       parameters:
         - name: namespaceName
@@ -1821,7 +1781,6 @@ paths:
   /v1/services/{serviceName}:
     get:
       operationId: ServicesApi_get
-      summary: Get Service
       description: Get service details
       parameters:
         - name: serviceName
@@ -1875,7 +1834,6 @@ paths:
   /v1/services/{serviceName}/dependencies:
     get:
       operationId: ServicesApi_getDependencies
-      summary: Service Dependencies
       description: Get service dependencies
       parameters:
         - name: serviceName
@@ -1931,7 +1889,6 @@ paths:
   /v1/services/{serviceName}/operations:
     get:
       operationId: ServicesApi_getOperations
-      summary: Service Operations
       description: Get service operations
       parameters:
         - name: serviceName
@@ -2020,7 +1977,6 @@ paths:
   /v1/sessions:
     get:
       operationId: SessionsApi_list
-      summary: List Sessions
       description: List sessions
       parameters:
         - name: userId
@@ -2136,7 +2092,6 @@ paths:
   /v1/sessions/stats:
     get:
       operationId: SessionsApi_getStats
-      summary: Session Statistics
       description: Get session statistics
       parameters:
         - name: startTime
@@ -2184,7 +2139,6 @@ paths:
   /v1/sessions/{sessionId}:
     get:
       operationId: SessionsApi_get
-      summary: Get Session
       description: Get session by ID
       parameters:
         - name: sessionId
@@ -2238,7 +2192,6 @@ paths:
   /v1/sessions/{sessionId}/traces:
     get:
       operationId: SessionsApi_getTraces
-      summary: Session Traces
       description: Get session traces
       parameters:
         - name: sessionId
@@ -2327,7 +2280,6 @@ paths:
   /v1/stream/deployments:
     get:
       operationId: StreamingApi_streamDeployments
-      summary: Stream Deployments
       description: Stream deployment events
       parameters:
         - name: serviceName
@@ -2356,7 +2308,6 @@ paths:
   /v1/stream/events:
     get:
       operationId: StreamingApi_streamEvents
-      summary: Stream All Events
       description: Stream all telemetry events (SSE)
       parameters:
         - name: types
@@ -2395,7 +2346,6 @@ paths:
   /v1/stream/exceptions:
     get:
       operationId: StreamingApi_streamExceptions
-      summary: Stream Exceptions
       description: Stream exceptions in real-time
       parameters:
         - name: serviceName
@@ -2424,7 +2374,6 @@ paths:
   /v1/stream/logs:
     get:
       operationId: StreamingApi_streamLogs
-      summary: Stream Logs
       description: Stream logs in real-time
       parameters:
         - name: serviceName
@@ -2461,7 +2410,6 @@ paths:
   /v1/stream/metrics:
     get:
       operationId: StreamingApi_streamMetrics
-      summary: Stream Metrics
       description: Stream metrics in real-time
       parameters:
         - name: metricName
@@ -2490,7 +2438,6 @@ paths:
   /v1/stream/traces:
     get:
       operationId: StreamingApi_streamTraces
-      summary: Stream Traces
       description: Stream traces in real-time
       parameters:
         - name: serviceName
@@ -2520,7 +2467,6 @@ paths:
   /v1/stream/traces/{traceId}/spans:
     get:
       operationId: StreamingApi_streamTraceSpans
-      summary: Stream Trace Spans
       description: Stream spans for a specific trace
       parameters:
         - name: traceId
@@ -2540,7 +2486,6 @@ paths:
   /v1/traces:
     get:
       operationId: TracesApi_list
-      summary: List Traces
       description: List traces with pagination
       parameters:
         - name: serviceName
@@ -2689,7 +2634,6 @@ paths:
   /v1/traces/search:
     post:
       operationId: TracesApi_search
-      summary: Search Traces
       description: Search traces
       parameters: []
       responses:
@@ -2763,7 +2707,6 @@ paths:
   /v1/traces/{traceId}:
     get:
       operationId: TracesApi_get
-      summary: Get Trace
       description: Get a specific trace by ID
       parameters:
         - name: traceId
@@ -2817,7 +2760,6 @@ paths:
   /v1/traces/{traceId}/spans:
     get:
       operationId: TracesApi_getSpans
-      summary: Get Trace Spans
       description: Get spans for a trace
       parameters:
         - name: traceId
@@ -2857,7 +2799,7 @@ paths:
                   items:
                     type: array
                     items:
-                      $ref: '#/components/schemas/Qyl.OTel.Traces.Span'
+                      $ref: '#/components/schemas/Qyl.Storage.SpanRecord'
                     description: List of items in this page
                   next_cursor:
                     type: string
@@ -3340,21 +3282,34 @@ components:
         - type: string
           contentEncoding: base64
       description: Primitive attribute value types supported by OpenTelemetry
+    Qyl.Common.CostUsd:
+      type: number
+      format: double
+      minimum: 0
+      description: Cost in USD (floating point)
+      x-csharp-type: double
+      x-duckdb-type: DOUBLE
     Qyl.Common.Count:
       type: integer
       format: int64
       minimum: 0
       description: Generic non-negative counter
+      x-csharp-type: long
+      x-duckdb-type: BIGINT
     Qyl.Common.DurationMs:
       type: number
       format: double
       minimum: 0
       description: Duration in milliseconds
+      x-csharp-type: double
+      x-duckdb-type: DOUBLE
     Qyl.Common.DurationNs:
       type: integer
       format: int64
       minimum: 0
       description: Duration in nanoseconds
+      x-csharp-type: long
+      x-duckdb-type: UBIGINT
     Qyl.Common.DurationS:
       type: number
       format: double
@@ -3577,12 +3532,16 @@ components:
       minimum: 0
       maximum: 100
       description: Percentage value (0.0 to 100.0)
+      x-csharp-type: double
+      x-duckdb-type: DOUBLE
     Qyl.Common.Ratio:
       type: number
       format: double
       minimum: 0
       maximum: 1
       description: Ratio value (0.0 to 1.0)
+      x-csharp-type: double
+      x-duckdb-type: DOUBLE
     Qyl.Common.SemVer:
       type: string
       pattern: ^(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)(?:-((?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*)(?:\.(?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*))*))?(?:\+([0-9a-zA-Z-]+(?:\.[0-9a-zA-Z-]+)*))?$
@@ -3594,6 +3553,9 @@ components:
       minLength: 1
       maxLength: 128
       description: Unique session identifier
+      x-csharp-type: SessionId
+      x-csharp-struct: true
+      x-duckdb-type: VARCHAR(128)
     Qyl.Common.SpanId:
       type: string
       minLength: 16
@@ -3602,11 +3564,24 @@ components:
       description: Unique span identifier (16 lowercase hex characters)
       examples:
         - b7ad6b7169203331
+      x-csharp-type: SpanId
+      x-csharp-struct: true
+      x-duckdb-type: VARCHAR(16)
+    Qyl.Common.Temperature:
+      type: number
+      format: double
+      minimum: 0
+      maximum: 2
+      description: Temperature setting for LLM requests (0.0-2.0)
+      x-csharp-type: double
+      x-duckdb-type: DOUBLE
     Qyl.Common.TokenCount:
       type: integer
       format: int64
       minimum: 0
       description: Token count (for LLM operations)
+      x-csharp-type: long
+      x-duckdb-type: BIGINT
     Qyl.Common.TraceId:
       type: string
       minLength: 32
@@ -3615,6 +3590,9 @@ components:
       description: Unique trace identifier (32 lowercase hex characters)
       examples:
         - 0af7651916cd43dd8448eb211c80319c
+      x-csharp-type: TraceId
+      x-csharp-struct: true
+      x-duckdb-type: VARCHAR(32)
     Qyl.Common.TraceState:
       type: string
       description: W3C Trace Context tracestate header (vendor-specific key-value pairs)
@@ -3889,6 +3867,8 @@ components:
             $ref: '#/components/schemas/Qyl.Common.TraceId'
           description: Sample trace IDs
       description: Error entity for tracking and analysis
+      x-csharp-type: ErrorEntity
+      x-duckdb-table: errors
     Qyl.Domains.Observe.Error.ErrorServiceStats:
       type: object
       required:
@@ -4551,6 +4531,8 @@ components:
             - $ref: '#/components/schemas/Qyl.Domains.Observe.Session.SessionGenAiUsage'
           description: GenAI usage summary
       description: Complete session entity with aggregated data
+      x-csharp-type: SessionEntity
+      x-duckdb-table: session_entities
     Qyl.Domains.Observe.Session.SessionGenAiUsage:
       type: object
       required:
@@ -4842,6 +4824,8 @@ components:
           type: string
           description: Error message (if failed)
       description: Complete deployment record
+      x-csharp-type: DeploymentEntity
+      x-duckdb-table: deployments
     Qyl.Domains.Ops.Deployment.DeploymentEnvironment:
       type: string
       enum:
@@ -5164,6 +5148,8 @@ components:
             - $ref: '#/components/schemas/Qyl.Common.InstrumentationScope'
           description: Instrumentation scope
       description: OpenTelemetry Log Record
+      x-csharp-type: LogStorageRow
+      x-duckdb-table: logs
     Qyl.OTel.Logs.LogStats:
       type: object
       required:
@@ -5975,6 +5961,159 @@ components:
           type: boolean
           description: Whether trace contains errors
       description: Complete trace containing all related spans
+    Qyl.Storage.SpanRecord:
+      type: object
+      required:
+        - spanId
+        - traceId
+        - name
+        - kind
+        - startTimeUnixNano
+        - endTimeUnixNano
+        - durationNs
+        - statusCode
+      properties:
+        spanId:
+          allOf:
+            - $ref: '#/components/schemas/Qyl.Common.SpanId'
+          description: Unique span identifier
+          x-duckdb-primary-key: true
+          x-duckdb-column: span_id
+        traceId:
+          allOf:
+            - $ref: '#/components/schemas/Qyl.Common.TraceId'
+          description: Trace identifier
+          x-duckdb-index: idx_spans_trace_id
+          x-duckdb-column: trace_id
+        parentSpanId:
+          allOf:
+            - $ref: '#/components/schemas/Qyl.Common.SpanId'
+          description: Parent span identifier (null for root spans)
+          x-duckdb-column: parent_span_id
+        sessionId:
+          allOf:
+            - $ref: '#/components/schemas/Qyl.Common.SessionId'
+          description: Session identifier for grouping related traces
+          x-promoted: true
+          x-duckdb-index: idx_spans_session_id
+          x-duckdb-column: session_id
+        name:
+          type: string
+          minLength: 1
+          description: Human-readable span name
+          x-duckdb-column: name
+        kind:
+          allOf:
+            - $ref: '#/components/schemas/Qyl.OTel.Enums.SpanKind'
+          description: Span kind
+          x-duckdb-column: kind
+        startTimeUnixNano:
+          type: integer
+          format: int64
+          description: Start timestamp in nanoseconds since epoch
+          x-duckdb-index: idx_spans_start_time
+          x-duckdb-column: start_time_unix_nano
+        endTimeUnixNano:
+          type: integer
+          format: int64
+          description: End timestamp in nanoseconds since epoch
+          x-duckdb-column: end_time_unix_nano
+        durationNs:
+          allOf:
+            - $ref: '#/components/schemas/Qyl.Common.DurationNs'
+          description: Duration in nanoseconds
+          x-duckdb-column: duration_ns
+        statusCode:
+          allOf:
+            - $ref: '#/components/schemas/Qyl.OTel.Enums.SpanStatusCode'
+          description: Span status code
+          x-duckdb-column: status_code
+        statusMessage:
+          type: string
+          description: Status message (only for ERROR status)
+          x-duckdb-column: status_message
+        serviceName:
+          type: string
+          description: Service name from resource attributes
+          x-promoted: true
+          x-duckdb-index: idx_spans_service_name
+          x-duckdb-column: service_name
+        genAiProviderName:
+          type: string
+          description: 'GenAI provider name (e.g., openai, anthropic) - OTel 1.39: gen_ai.provider.name'
+          x-promoted: true
+          x-duckdb-index: idx_spans_gen_ai_provider_name
+          x-duckdb-column: gen_ai_provider_name
+        genAiRequestModel:
+          type: string
+          description: Requested model name
+          x-promoted: true
+          x-duckdb-index: idx_spans_gen_ai_request_model
+          x-duckdb-column: gen_ai_request_model
+        genAiResponseModel:
+          type: string
+          description: Actual response model name
+          x-promoted: true
+          x-duckdb-column: gen_ai_response_model
+        genAiInputTokens:
+          allOf:
+            - $ref: '#/components/schemas/Qyl.Common.TokenCount'
+          description: Input/prompt tokens
+          x-promoted: true
+          x-duckdb-column: gen_ai_input_tokens
+        genAiOutputTokens:
+          allOf:
+            - $ref: '#/components/schemas/Qyl.Common.TokenCount'
+          description: Output/completion tokens
+          x-promoted: true
+          x-duckdb-column: gen_ai_output_tokens
+        genAiTemperature:
+          allOf:
+            - $ref: '#/components/schemas/Qyl.Common.Temperature'
+          description: Request temperature
+          x-promoted: true
+          x-duckdb-column: gen_ai_temperature
+        genAiStopReason:
+          type: string
+          description: Response finish reason
+          x-promoted: true
+          x-duckdb-column: gen_ai_stop_reason
+        genAiToolName:
+          type: string
+          description: Tool name for tool calls
+          x-promoted: true
+          x-duckdb-column: gen_ai_tool_name
+        genAiToolCallId:
+          type: string
+          description: Tool call ID
+          x-promoted: true
+          x-duckdb-column: gen_ai_tool_call_id
+        genAiCostUsd:
+          allOf:
+            - $ref: '#/components/schemas/Qyl.Common.CostUsd'
+          description: Estimated cost in USD
+          x-promoted: true
+          x-duckdb-column: gen_ai_cost_usd
+        attributesJson:
+          type: string
+          description: All span attributes as JSON
+          x-duckdb-type: VARCHAR
+          x-duckdb-column: attributes_json
+        resourceJson:
+          type: string
+          description: Resource attributes as JSON
+          x-duckdb-type: VARCHAR
+          x-duckdb-column: resource_json
+        createdAt:
+          type: string
+          format: date-time
+          description: Row creation timestamp
+          x-internal: true
+          x-duckdb-type: TIMESTAMP DEFAULT now()
+          x-duckdb-column: created_at
+      description: OpenTelemetry span record for storage and query
+      x-csharp-type: SpanRecord
+      x-duckdb-table: spans
     ServiceDetails:
       type: object
       required:
@@ -6374,3 +6513,10 @@ components:
           type: string
           description: Cursor
       description: Trace search query
+servers:
+  - url: https://api.staging.qyl.dev
+    description: QYL Staging API
+    variables: {}
+  - url: https://api.qyl.dev
+    description: QYL Production API
+    variables: {}

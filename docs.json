@@ -150,9 +150,9 @@
           {
             "group": "Health",
             "pages": [
-              "api-reference/endpoint/HealthApi_check",
-              "api-reference/endpoint/HealthApi_live",
-              "api-reference/endpoint/HealthApi_ready"
+              "api-reference/endpoint/health_check",
+              "api-reference/endpoint/health_liveness",
+              "api-reference/endpoint/health_readiness"
             ]
           },
           {
