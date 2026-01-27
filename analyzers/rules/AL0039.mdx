@@ -53,3 +53,8 @@ dotnet_diagnostic.AL0039.severity = warning
 | EndsWith   | `EndsWithOrdinal()`   | `EndsWithIgnoreCase()`   |
 | Contains   | `ContainsOrdinal()`   | `ContainsIgnoreCase()`   |
 | IndexOf    | `IndexOfOrdinal()`    | `IndexOfIgnoreCase()`    |
+
+## Limitations
+
+- **`LastIndexOf`** is not flagged - no extension method exists
+- **`IndexOf` with startIndex** is not flagged - extensions only support simple `(value, StringComparison)` signatures
