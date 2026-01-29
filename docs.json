@@ -148,6 +148,7 @@
               "erroror/overview",
               "erroror/http-mapping",
               "erroror/generator",
+              "erroror/api-versioning",
               "erroror/diagnostics"
             ]
           }

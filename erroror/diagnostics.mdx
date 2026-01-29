@@ -51,6 +51,7 @@ The ErrorOrX generator and analyzer emit diagnostics to help catch issues at com
 | EOE032 | Warning  | Unknown error factory method                                    |
 | EOE033 | Error    | Undocumented interface call                                     |
 | EOE040 | Warning  | Missing CamelCase JSON policy on user's `JsonSerializerContext` |
+| EOE041 | Error    | Missing `JsonSerializerContext` for AOT with `[FromBody]`       |
 
 ### Response Attributes
 
@@ -62,11 +63,17 @@ The ErrorOrX generator and analyzer emit diagnostics to help catch issues at com
 
 | ID     | Severity | Description                                                          |
 | ------ | -------- | -------------------------------------------------------------------- |
-| EOE050 | Error    | `[ApiVersionNeutral]` and `[MapToApiVersion]` are mutually exclusive |
-| EOE051 | Error    | `[MapToApiVersion]` references undeclared version                    |
-| EOE052 | Error    | `Asp.Versioning.Http` package not referenced                         |
-| EOE053 | Warning  | Endpoint missing versioning when others use it                       |
-| EOE054 | Error    | Invalid version format                                               |
+| EOE050 | Warning  | `[ApiVersionNeutral]` and `[MapToApiVersion]` are mutually exclusive |
+| EOE051 | Warning  | `[MapToApiVersion]` references undeclared version                    |
+| EOE052 | Warning  | `Asp.Versioning.Http` package not referenced                         |
+| EOE053 | Info     | Endpoint missing versioning when others use it                       |
+| EOE054 | Error    | Invalid API version format                                           |
+| EOE055 | Warning  | Duplicate route parameter binding                                    |
+
+<Note>
+  API versioning support requires the `Asp.Versioning.Http` package. See the
+  [API Versioning guide](/erroror/api-versioning) for setup instructions.
+</Note>
 
 ## Common Fixes
 
@@ -156,4 +163,87 @@ internal partial class AppJsonContext : JsonSerializerContext { }
     DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull)]
 [JsonSerializable(typeof(Todo))]
 internal partial class AppJsonContext : JsonSerializerContext { }
+```
+
+### EOE050: Version-Neutral with Mappings
+
+```csharp
+// ❌ Wrong - conflicting attributes
+[ApiVersionNeutral]
+[MapToApiVersion("2.0")]
+[Get("/health")]
+public static ErrorOr<HealthStatus> Check() => ...
+
+// ✅ Correct - use one or the other
+[ApiVersionNeutral]
+[Get("/health")]
+public static ErrorOr<HealthStatus> Check() => ...
+```
+
+### EOE051: Mapped Version Not Declared
+
+```csharp
+// ❌ Wrong - 2.0 not in declared versions
+[ApiVersion("1.0")]
+public static class UsersEndpoints
+{
+    [MapToApiVersion("2.0")]  // EOE051
+    [Get("/users")]
+    public static ErrorOr<List<User>> GetAll() => ...
+}
+
+// ✅ Correct - declare all versions
+[ApiVersion("1.0")]
+[ApiVersion("2.0")]
+public static class UsersEndpoints { ... }
+```
+
+### EOE054: Invalid API Version Format
+
+```csharp
+// ❌ Wrong - invalid formats
+[ApiVersion("v1")]        // No "v" prefix allowed
+[ApiVersion("1.0.0.0")]   // Too many segments
+
+// ✅ Correct - valid formats
+[ApiVersion("1.0")]
+[ApiVersion("2")]
+[ApiVersion("1.0-beta")]
+```
+
+### EOE041: Missing JsonSerializerContext for AOT
+
+```csharp
+// ❌ Error - [FromBody] without JsonSerializerContext for AOT
+[Post("/todos")]
+public static ErrorOr<Todo> Create([FromBody] CreateTodoRequest req) => ...
+
+// ✅ Correct - register a JsonSerializerContext
+// 1. Create your context
+[JsonSourceGenerationOptions(PropertyNamingPolicy = JsonKnownNamingPolicy.CamelCase)]
+[JsonSerializable(typeof(CreateTodoRequest))]
+[JsonSerializable(typeof(Todo))]
+[JsonSerializable(typeof(ProblemDetails))]
+internal partial class AppJsonContext : JsonSerializerContext { }
+
+// 2. Register in Program.cs
+builder.Services.AddErrorOrEndpoints()
+    .UseJsonContext<AppJsonContext>();
+```
+
+### EOE055: Duplicate Route Parameter Binding
+
+```csharp
+// ❌ Warning - duplicate binding to same route parameter
+[Get("/files/{id}")]
+public static ErrorOr<File> Get(
+    [FromRoute(Name = "id")] int fileId,      // Used
+    [FromRoute(Name = "id")] string category) // EOE055: Ignored
+{
+    return new File(fileId, category);
+}
+
+// ✅ Correct - use unique route parameter names
+[Get("/files/{fileId}/{category}")]
+public static ErrorOr<File> Get(int fileId, string category) => ...
 ```

@@ -31,14 +31,23 @@ This section documents **ErrorOrX** - a discriminated union library for .NET wit
 | Results<> Union | Generated OpenAPI-compatible response types |
 | Fluent API      | Then, Else, Match, Switch, FailIf           |
 
+### Key Features
+
+| Feature                 | Status   | Description                                                         |
+| ----------------------- | -------- | ------------------------------------------------------------------- |
+| Smart parameter binding | Complete | Infers [FromBody]/[FromServices] based on HTTP method and type      |
+| Middleware emission     | Complete | Emits fluent calls for security attributes (23 tests)               |
+| Multiple auth policies  | Complete | Accumulates `[Authorize]` attributes into single call               |
+| API versioning          | Complete | Supports `[ApiVersion]`, `[MapToApiVersion]`, `[ApiVersionNeutral]` |
+
 ### Diagnostics
 
 All diagnostics use the `EOE` prefix (ErrorOr Endpoints):
 
 - EOE001-EOE021: Handler structure errors
 - EOE023-EOE025: Parameter binding
-- EOE030-EOE040: AOT/serialization
-- EOE050-EOE054: API versioning
+- EOE030-EOE041: AOT/serialization
+- EOE050-EOE055: API versioning (including EOE055 duplicate route parameter binding)
 
 ### External Reference
 

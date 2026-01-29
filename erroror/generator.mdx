@@ -151,21 +151,102 @@ public static ErrorOr<Order> Ship(int orderId, IOrderService svc) =>
 
 ## Middleware Attributes
 
-The generator emits middleware fluent calls since the wrapper delegate loses original method attributes:
+The generator emits middleware fluent calls since the wrapper delegate loses original method attributes.
 
-| Attribute                        | Generated Call                    |
-| -------------------------------- | --------------------------------- |
-| `[Authorize]`                    | `.RequireAuthorization()`         |
-| `[Authorize("Policy")]`          | `.RequireAuthorization("Policy")` |
-| `[EnableRateLimiting("Policy")]` | `.RequireRateLimiting("Policy")`  |
-| `[OutputCache]`                  | `.CacheOutput()`                  |
-| `[EnableCors("Policy")]`         | `.RequireCors("Policy")`          |
+<Warning>
+  This is security-critical. ASP.NET Core only sees attributes on the delegate
+  passed to `MapGet()`/`MapPost()`. Since ErrorOrX generates a wrapper method,
+  the original method's attributes are invisible to ASP.NET. The generator MUST
+  emit equivalent fluent calls.
+</Warning>
+
+### Authorization
+
+| Attribute                               | Generated Call                      |
+| --------------------------------------- | ----------------------------------- |
+| `[Authorize]`                           | `.RequireAuthorization()`           |
+| `[Authorize("Policy")]`                 | `.RequireAuthorization("Policy")`   |
+| `[Authorize("P1")]` `[Authorize("P2")]` | `.RequireAuthorization("P1", "P2")` |
+| `[AllowAnonymous]`                      | `.AllowAnonymous()`                 |
+
+Multiple `[Authorize]` attributes with different policies are accumulated and emitted as a single call:
+
+```csharp
+[Get("/admin/secrets")]
+[Authorize("AdminPolicy")]
+[Authorize("AuditPolicy")]
+public static ErrorOr<string> GetSecrets() => "top-secret";
+
+// Generated: .RequireAuthorization("AdminPolicy", "AuditPolicy")
+```
+
+<Note>
+  `[AllowAnonymous]` overrides `[Authorize]`. When both are present, only
+  `.AllowAnonymous()` is emitted.
+</Note>
+
+### Rate Limiting
+
+| Attribute                        | Generated Call                   |
+| -------------------------------- | -------------------------------- |
+| `[EnableRateLimiting("policy")]` | `.RequireRateLimiting("policy")` |
+| `[DisableRateLimiting]`          | `.DisableRateLimiting()`         |
+
+<Note>
+  `[DisableRateLimiting]` overrides `[EnableRateLimiting]`. When both are
+  present, only `.DisableRateLimiting()` is emitted.
+</Note>
+
+### Output Caching
+
+| Attribute                         | Generated Call                                          |
+| --------------------------------- | ------------------------------------------------------- |
+| `[OutputCache]`                   | `.CacheOutput()`                                        |
+| `[OutputCache(PolicyName = "x")]` | `.CacheOutput("x")`                                     |
+| `[OutputCache(Duration = 60)]`    | `.CacheOutput(p => p.Expire(TimeSpan.FromSeconds(60)))` |
+
+### CORS
+
+| Attribute                | Generated Call           |
+| ------------------------ | ------------------------ |
+| `[EnableCors]`           | `.RequireCors()`         |
+| `[EnableCors("Policy")]` | `.RequireCors("Policy")` |
+| `[DisableCors]`          | (disables CORS)          |
+
+### Combining Multiple Middleware
+
+All middleware attributes can be combined on a single endpoint:
+
+```csharp
+[Get("/api/data")]
+[Authorize("ApiPolicy")]
+[EnableRateLimiting("standard")]
+[OutputCache(PolicyName = "ApiCache")]
+[EnableCors("Production")]
+public static ErrorOr<Data> GetData() => ...
+
+// Generated:
+// app.MapGet("/api/data", Invoke_Ep0)
+//     .RequireAuthorization("ApiPolicy")
+//     .RequireRateLimiting("standard")
+//     .CacheOutput("ApiCache")
+//     .RequireCors("Production")
+//     .WithName("Api_GetData")
+//     .WithTags("Api");
+```
 
 ## JSON Context Generation
 
+<Warning>
+  Roslyn source generators cannot see output from other generators. If ErrorOrX
+  generates a `JsonSerializerContext`, the System.Text.Json source generator
+  will NOT process it, causing runtime errors in Native AOT. **You MUST create
+  your own `JsonSerializerContext`.**
+</Warning>
+
 ### Default Behavior
 
-When `ErrorOrGenerateJsonContext` is `true` (default):
+When `ErrorOrGenerateJsonContext` is `false` (default):
 
 ```csharp
 // Generated ErrorOrJsonContext.g.cs
@@ -201,7 +282,13 @@ The generator emits a helper file with copy-paste attributes:
 
 | Property                     | Default | Purpose                             |
 | ---------------------------- | ------- | ----------------------------------- |
-| `ErrorOrGenerateJsonContext` | `true`  | Generate JSON serialization context |
+| `ErrorOrGenerateJsonContext` | `false` | Generate JSON serialization context |
+
+<Note>
+  `ErrorOrGenerateJsonContext` is disabled by default because generated JSON
+  contexts cannot be processed by System.Text.Json's source generator. See the
+  warning above.
+</Note>
 
 ## AOT Compatibility
 
@@ -268,7 +355,7 @@ This follows ASP.NET Core patterns like `MapRazorComponents()`.
 
 ## API Versioning
 
-Supports `Asp.Versioning.Http`:
+Full API versioning support with `Asp.Versioning.Http`:
 
 ```csharp
 [ApiVersion("1.0")]
@@ -291,3 +378,12 @@ public static class HealthEndpoints
     public static ErrorOr<HealthStatus> Check() => ...
 }
 ```
+
+<Card
+  title="API Versioning Guide"
+  icon="code-branch"
+  href="/erroror/api-versioning"
+>
+  Complete guide to API versioning including version formats, generated code,
+  service registration, and diagnostics (EOE050-EOE055).
+</Card>

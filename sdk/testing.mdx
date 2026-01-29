@@ -1,6 +1,6 @@
 ---
 title: 'Testing'
-description: 'xUnit v3 with Microsoft Testing Platform and integration test base classes.'
+description: 'xUnit v3 with Microsoft Testing Platform, integration test base classes, and AOT/Trim testing infrastructure.'
 icon: 'flask'
 ---
 
@@ -174,5 +174,172 @@ public class MyApiTests : IntegrationTestBase<Program>
 
     ## FakeLogger
 
-    See [Extensions](/sdk/extensions) for `FakeLogCollector` test helpers.
+See [Extensions](/sdk/extensions) for `FakeLogCollector` test helpers.
+
+## AOT/Trim Testing
+
+The SDK provides infrastructure for testing Native AOT and trimmed applications. Tests run as separate processes with `PublishAot=true` or `PublishTrimmed=true` to verify runtime behavior.
+
+### Enabling AOT Testing
+
+```xml
+<Project Sdk="ANcpLua.NET.Sdk.Test">
+  <PropertyGroup>
+    <EnableAotTesting>true</EnableAotTesting>
+  </PropertyGroup>
+</Project>
+```
+
+This automatically references `ANcpLua.AotTesting.Attributes`.
+
+### Writing AOT Tests
+
+AOT tests are methods returning `int` with exit code `100` for success:
+
+```csharp
+using ANcpLua.AotTesting;
+
+public class MyAotTests
+{
+    [AotTest]
+    public static int BasicAotTest()
+    {
+        var list = new List<int> { 1, 2, 3 };
+        if (list.Sum() != 6)
+        {
+            Console.Error.WriteLine("FAIL: Sum incorrect");
+            return 1;
+        }
+        return 100; // Success
+    }
+
+    [TrimTest(TrimMode = TrimMode.Full)]
+    public static int VerifyTrimmingWorks()
+    {
+        // Test trimming behavior
+        return 100;
+    }
+}
+```
+
+### Test Attributes
+
+<AccordionGroup>
+  <Accordion title="[AotTest]">
+    Publishes with `PublishAot=true` and executes the native binary.
+
+    ```csharp
+    [AotTest(
+        SkipOnPlatform = "osx",           // Skip on macOS
+        RuntimeIdentifier = "win-x64",     // Override RID
+        DisabledFeatureSwitches = new[] { FeatureSwitches.JsonReflection },
+        Configuration = "Release",         // Default: Release
+        TimeoutSeconds = 300               // Default: 5 minutes
+    )]
+    public static int MyAotTest() => 100;
+    ```
+  </Accordion>
+
+  <Accordion title="[TrimTest]">
+    Publishes with `PublishTrimmed=true` for testing IL trimming.
+
+    ```csharp
+    [TrimTest(
+        TrimMode = TrimMode.Full,    // Full or Partial
+        SkipOnPlatform = "linux",
+        TimeoutSeconds = 180
+    )]
+    public static int MyTrimTest() => 100;
+    ```
+  </Accordion>
+
+  <Accordion title="[TrimSafe] / [AotSafe]">
+    In-process markers verified by analyzers ([AL0043](/analyzers/rules/AL0043), [AL0044](/analyzers/rules/AL0044)):
+
+    ```csharp
+    [TrimSafe]  // Analyzer verifies no RequiresUnreferencedCode calls
+    public void ProcessData<T>(T data) { }
+
+    [AotSafe]   // Analyzer verifies no RequiresDynamicCode calls
+    public void CreateService() { }
+    ```
+  </Accordion>
+</AccordionGroup>
+
+### TrimAssert Helpers
+
+Verify types are trimmed or preserved at runtime:
+
+```csharp
+[TrimTest(TrimMode = TrimMode.Full)]
+public static int VerifyUnusedTypeTrimmed()
+{
+    // Assert type was trimmed away
+    TrimAssert.TypeTrimmed(
+        "MyNamespace.UnusedService",
+        "MyAssembly");
+
+    // Assert essential type survives
+    TrimAssert.TypePreserved(
+        "System.Collections.Generic.List`1",
+        "System.Private.CoreLib");
+
+    return 100;
+}
+```
+
+<Warning>
+  Do not use `typeof(X)` in assertions—it roots the type and prevents trimming.
+  Use string-based `TrimAssert` methods instead.
+</Warning>
+
+### Feature Switches
+
+Disable runtime features during tests:
+
+```csharp
+[AotTest(DisabledFeatureSwitches = new[] {
+    FeatureSwitches.JsonReflection,
+    FeatureSwitches.EventSourceSupport
+})]
+public static int TestWithoutReflection() => 100;
+```
+
+| Constant | Feature Switch |
+|----------|----------------|
+| `JsonReflection` | `System.Text.Json.JsonSerializer.IsReflectionEnabledByDefault` |
+| `DebuggerSupport` | `System.Diagnostics.Debugger.IsSupported` |
+| `EventSourceSupport` | `System.Diagnostics.Tracing.EventSource.IsSupported` |
+| `MetricsSupport` | `System.Diagnostics.Metrics.Meter.IsSupported` |
+| `XmlSerialization` | `System.Xml.XmlSerializer.IsEnabled` |
+| `BinaryFormatter` | `System.Runtime.Serialization.EnableUnsafeBinaryFormatterSerialization` |
+| `InvariantGlobalization` | `System.Globalization.Invariant` |
+| `HttpActivityPropagation` | `System.Net.Http.EnableActivityPropagation` |
+| `StartupHooks` | `System.StartupHookProvider.IsSupported` |
+
+### How It Works
+
+1. **Discovery**: MSBuild target scans for `[AotTest]`/`[TrimTest]` methods
+2. **Project Generation**: Creates temporary `.csproj` for each test
+3. **Publish**: Runs `dotnet publish` with AOT/Trim flags
+4. **Execute**: Runs the published executable
+5. **Validate**: Checks exit code (100 = success)
+
+### Exit Code Convention
+
+| Code | Meaning |
+|------|---------|
+| 100 | Success |
+| 1-99 | Test failure |
+| -1 | `TrimAssert.TypeTrimmed` failed (type exists) |
+| -2 | `TrimAssert.TypePreserved` failed (type missing) |
+
+### Related Analyzers
+
+| Rule | Description |
+|------|-------------|
+| [AL0041](/analyzers/rules/AL0041) | `[AotTest]`/`[TrimTest]` must return `int` |
+| [AL0042](/analyzers/rules/AL0042) | Should return 100 for success |
+| [AL0043](/analyzers/rules/AL0043) | `[TrimSafe]` cannot call `[RequiresUnreferencedCode]` |
+| [AL0044](/analyzers/rules/AL0044) | `[AotSafe]` cannot call `[RequiresDynamicCode]` |
 ````

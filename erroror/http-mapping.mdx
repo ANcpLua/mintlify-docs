@@ -148,6 +148,31 @@ Results<
 >
 ```
 
+## Middleware-Influenced Union Types
+
+The generator adds status codes to the `Results<...>` union based on middleware attributes:
+
+| Attribute              | Added to Union                               | Status Code |
+| ---------------------- | -------------------------------------------- | ----------- |
+| `[Authorize]`          | `UnauthorizedHttpResult`, `ForbidHttpResult` | 401, 403    |
+| `[EnableRateLimiting]` | `StatusCodeHttpResult` (429)                 | 429         |
+
+<Note>
+  `[AllowAnonymous]` overrides `[Authorize]`, so 401/403 are NOT added to the
+  union. Similarly, `[DisableRateLimiting]` overrides `[EnableRateLimiting]`, so
+  429 is NOT added.
+</Note>
+
+```csharp
+// With [Authorize], the union includes auth failure types
+[Get("/admin")]
+[Authorize]
+public static ErrorOr<string> AdminOnly() => ...
+
+// Generated union includes 401 and 403:
+Results<Ok<string>, UnauthorizedHttpResult, ForbidHttpResult>
+```
+
 ## Security Considerations
 
 `401 Unauthorized` and `403 Forbidden` return no body to prevent information leakage:
