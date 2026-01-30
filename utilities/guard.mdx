@@ -711,17 +711,17 @@ public void SaveFile(string? fileName)
 
 ### Numeric Validation (int, long, double, decimal)
 
-| Method                        | Throws                        | Description         |
-| ----------------------------- | ----------------------------- | ------------------- |
-| `NotZero(value)`              | `ArgumentOutOfRangeException` | Value != 0          |
-| `NotNegative(value)`          | `ArgumentOutOfRangeException` | Value >= 0          |
-| `Positive(value)`             | `ArgumentOutOfRangeException` | Value > 0           |
-| `NotGreaterThan(value, max)`  | `ArgumentOutOfRangeException` | Value <= max        |
-| `NotLessThan(value, min)`     | `ArgumentOutOfRangeException` | Value >= min        |
-| `LessThan(value, max)`        | `ArgumentOutOfRangeException` | Value < max         |
-| `GreaterThan(value, min)`     | `ArgumentOutOfRangeException` | Value > min         |
-| `InRange<T>(value, min, max)` | `ArgumentOutOfRangeException` | min <= value <= max |
-| `ValidIndex(index, count)`    | `ArgumentOutOfRangeException` | 0 <= index < count  |
+| Method                        | Throws                        | Description          |
+| ----------------------------- | ----------------------------- | -------------------- |
+| `NotZero(value)`              | `ArgumentOutOfRangeException` | Value != 0           |
+| `NotNegative(value)`          | `ArgumentOutOfRangeException` | Value >= 0           |
+| `Positive(value)`             | `ArgumentOutOfRangeException` | Value > 0            |
+| `NotGreaterThan(value, max)`  | `ArgumentOutOfRangeException` | value ≤ max          |
+| `NotLessThan(value, min)`     | `ArgumentOutOfRangeException` | value ≥ min          |
+| `LessThan(value, max)`        | `ArgumentOutOfRangeException` | value &lt; max       |
+| `GreaterThan(value, min)`     | `ArgumentOutOfRangeException` | value &gt; min       |
+| `InRange<T>(value, min, max)` | `ArgumentOutOfRangeException` | min ≤ value ≤ max    |
+| `ValidIndex(index, count)`    | `ArgumentOutOfRangeException` | 0 ≤ index &lt; count |
 
 ### Double-Specific
 
