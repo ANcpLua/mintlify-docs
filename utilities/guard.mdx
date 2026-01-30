@@ -130,6 +130,51 @@ var title = Guard.NotNullOrWhiteSpaceOrElse(article.Title, "Untitled");
 var config = Guard.NotNullOrEmptyOrElse(optionalConfig, () => LoadDefaultConfig());
 ```
 
+## String Length Validation
+
+### HasLength
+
+Validates exact string length:
+
+```csharp
+public void SetCountryCode(string? code)
+{
+    _code = Guard.HasLength(code, 2);  // ISO country codes
+    // Throws ArgumentNullException if null
+    // Throws ArgumentException if length != 2
+}
+```
+
+### HasMinLength / HasMaxLength
+
+Validates minimum or maximum string length:
+
+```csharp
+public void SetPassword(string? password)
+{
+    _password = Guard.HasMinLength(password, 8);
+    // Throws if length < 8
+}
+
+public void SetUsername(string? username)
+{
+    _username = Guard.HasMaxLength(username, 50);
+    // Throws if length > 50
+}
+```
+
+### HasLengthBetween
+
+Validates string length is within a range (inclusive):
+
+```csharp
+public void SetDisplayName(string? name)
+{
+    _name = Guard.HasLengthBetween(name, 3, 100);
+    // Throws if length < 3 or length > 100
+}
+```
+
 ## Collection Validation
 
 ### NotNullOrEmpty
@@ -164,6 +209,97 @@ public void Process(IReadOnlyList<string>? names)
 {
     var validNames = Guard.NoDuplicates(names);
     // Validates non-null AND no duplicates
+}
+
+// With custom equality comparer
+public void SetNames(IEnumerable<string> names)
+{
+    Guard.NoDuplicates(names, StringComparer.OrdinalIgnoreCase);
+    // Case-insensitive duplicate detection
+}
+```
+
+## Value Type Validation
+
+### NotDefault
+
+Validates that a value type is not its default value:
+
+```csharp
+public void SetId(Guid id)
+{
+    _id = Guard.NotDefault(id);
+    // Throws ArgumentException if id == default(Guid)
+}
+
+public void SetTimestamp(DateTime timestamp)
+{
+    _timestamp = Guard.NotDefault(timestamp);
+    // Throws if timestamp == default(DateTime)
+}
+```
+
+### NotEmpty (Guid)
+
+Validates that a Guid is not empty:
+
+```csharp
+public void SetUserId(Guid userId)
+{
+    _userId = Guard.NotEmpty(userId);
+    // Throws ArgumentException if userId == Guid.Empty
+}
+```
+
+<Note>
+  `NotEmpty` for Guid is semantically clearer than `NotDefault` when working
+  with identifiers, though they produce the same result for Guid.
+</Note>
+
+## Set Membership Validation
+
+### OneOf
+
+Validates that a value is one of the allowed values:
+
+```csharp
+public void SetProtocol(string protocol)
+{
+    _protocol = Guard.OneOf(protocol, new[] { "http", "https", "ftp" });
+    // Throws ArgumentException if not in allowed set
+}
+
+// O(1) lookup with HashSet for large allowed sets
+private static readonly HashSet<string> AllowedContentTypes = new(StringComparer.OrdinalIgnoreCase)
+{
+    "application/json",
+    "application/xml",
+    "text/plain"
+};
+
+public void SetContentType(string contentType)
+{
+    _contentType = Guard.OneOf(contentType, AllowedContentTypes);
+}
+```
+
+### NotOneOf
+
+Validates that a value is not one of the disallowed values:
+
+```csharp
+public void SetPort(int port)
+{
+    _port = Guard.NotOneOf(port, new[] { 0, 80, 443 });  // Reserved ports
+    // Throws ArgumentException if in disallowed set
+}
+
+// O(1) lookup with HashSet
+private static readonly HashSet<int> ReservedPorts = new() { 0, 80, 443, 8080 };
+
+public void SetCustomPort(int port)
+{
+    _port = Guard.NotOneOf(port, ReservedPorts);
 }
 ```
 
@@ -392,10 +528,24 @@ return status switch
 Guard.Unreachable("All enum values should be handled");
 ```
 
+### UnreachableIf
+
+Throws only when a condition is true, useful for asserting invariants:
+
+```csharp
+// Assert an invariant that should never be violated
+Guard.UnreachableIf(list.Count < 0, "Count should never be negative");
+
+// In validation logic
+Guard.UnreachableIf(
+    state == ProcessState.Running && !hasStarted,
+    "Cannot be running without having started");
+```
+
 <Tip>
-  `Unreachable` automatically captures caller info (`CallerMemberName`,
-  `CallerFilePath`, `CallerLineNumber`) to provide detailed exception messages
-  for debugging.
+  `Unreachable` and `UnreachableIf` automatically capture caller info
+  (`CallerMemberName`, `CallerFilePath`, `CallerLineNumber`) to provide detailed
+  exception messages for debugging.
 </Tip>
 
 ## Examples
@@ -467,7 +617,20 @@ public void ProcessFile(string? inputPath, string? outputFileName)
     // Validate output filename is valid
     var output = Guard.ValidFileName(outputFileName);
 
+    // Normalize the extension
+    var ext = Guard.NormalizedExtension("txt");  // Returns ".txt"
+
     // Process...
+}
+
+// Optional filename validation (returns null if input is null)
+public void SaveFile(string? fileName)
+{
+    var validName = Guard.ValidFileNameOrNull(fileName);
+    if (validName is not null)
+    {
+        // Save with validated name
+    }
 }
 ```
 
@@ -493,14 +656,36 @@ public void ProcessFile(string? inputPath, string? outputFileName)
 | `NotNullOrEmptyOrElse(string, Func<string>)`      | -                                            | Lazy default evaluation       |
 | `NotNullOrWhiteSpaceOrElse(string, default)`      | -                                            | Returns value or default      |
 | `NotNullOrWhiteSpaceOrElse(string, Func<string>)` | -                                            | Lazy default evaluation       |
+| `HasLength(string, int)`                          | `ArgumentNullException`, `ArgumentException` | Exact length                  |
+| `HasMinLength(string, int)`                       | `ArgumentNullException`, `ArgumentException` | Minimum length                |
+| `HasMaxLength(string, int)`                       | `ArgumentNullException`, `ArgumentException` | Maximum length                |
+| `HasLengthBetween(string, int, int)`              | `ArgumentNullException`, `ArgumentException` | Length in range               |
 
 ### Collection Validation
 
-| Method                              | Throws                                       | Description                |
-| ----------------------------------- | -------------------------------------------- | -------------------------- |
-| `NotNullOrEmpty<T>(collection)`     | `ArgumentNullException`, `ArgumentException` | Validates collection       |
-| `NoDuplicates<T>(IEnumerable<T>)`   | `ArgumentException`                          | Validates no duplicates    |
-| `NoDuplicates<T>(IReadOnlyList<T>)` | `ArgumentNullException`, `ArgumentException` | Validates and returns list |
+| Method                                        | Throws                                       | Description                |
+| --------------------------------------------- | -------------------------------------------- | -------------------------- |
+| `NotNullOrEmpty<T>(collection)`               | `ArgumentNullException`, `ArgumentException` | Validates collection       |
+| `NoDuplicates<T>(IEnumerable<T>)`             | `ArgumentException`                          | Validates no duplicates    |
+| `NoDuplicates<T>(IEnumerable<T>, comparer)`   | `ArgumentException`                          | With custom equality       |
+| `NoDuplicates<T>(IReadOnlyList<T>)`           | `ArgumentNullException`, `ArgumentException` | Validates and returns list |
+| `NoDuplicates<T>(IReadOnlyList<T>, comparer)` | `ArgumentNullException`, `ArgumentException` | With custom equality       |
+
+### Value Type Validation
+
+| Method             | Throws              | Description            |
+| ------------------ | ------------------- | ---------------------- |
+| `NotDefault<T>(T)` | `ArgumentException` | Value type not default |
+| `NotEmpty(Guid)`   | `ArgumentException` | Guid is not Guid.Empty |
+
+### Set Membership Validation
+
+| Method                       | Throws              | Description                 |
+| ---------------------------- | ------------------- | --------------------------- |
+| `OneOf<T>(T, T[])`           | `ArgumentException` | Value in allowed set        |
+| `OneOf<T>(T, HashSet<T>)`    | `ArgumentException` | O(1) lookup variant         |
+| `NotOneOf<T>(T, T[])`        | `ArgumentException` | Value not in disallowed set |
+| `NotOneOf<T>(T, HashSet<T>)` | `ArgumentException` | O(1) lookup variant         |
 
 ### File System Validation
 
@@ -547,12 +732,13 @@ public void ProcessFile(string? inputPath, string? outputFileName)
 
 ### Condition Validation
 
-| Method                                    | Throws                      | Description              |
-| ----------------------------------------- | --------------------------- | ------------------------ |
-| `That(condition, message)`                | `ArgumentException`         | Validates condition      |
-| `Satisfies<T>(value, predicate, message)` | `ArgumentException`         | Validates with predicate |
-| `Unreachable(message?)`                   | `InvalidOperationException` | Marks unreachable code   |
-| `Unreachable<T>(message?)`                | `InvalidOperationException` | For expression contexts  |
+| Method                                    | Throws                      | Description                     |
+| ----------------------------------------- | --------------------------- | ------------------------------- |
+| `That(condition, message)`                | `ArgumentException`         | Validates condition             |
+| `Satisfies<T>(value, predicate, message)` | `ArgumentException`         | Validates with predicate        |
+| `Unreachable(message?)`                   | `InvalidOperationException` | Marks unreachable code          |
+| `Unreachable<T>(message?)`                | `InvalidOperationException` | For expression contexts         |
+| `UnreachableIf(condition, message?)`      | `InvalidOperationException` | Throws only when condition true |
 
 <Note>
   All validation methods use `CallerArgumentExpressionAttribute` to
